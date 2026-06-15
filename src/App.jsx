@@ -247,11 +247,63 @@ export default function App() {
       };
 
       // 2. Subir elementos secundarios si existen
-      const uploads = [];
-      if (savedBudget.length > 0) {
-        uploads.push(supabase.from('budget_items').insert(savedBudget.map(b => ({
-          id: b.id,
+      // Mapear IDs a nuevos IDs únicos para evitar colisiones
+      const tableIdMap = {};
+      const migratedTables = savedTables.map(t => {
+        const uniqueId = 't_' + Math.random().toString(36).substring(2, 9) + Date.now().toString().slice(-4);
+        tableIdMap[t.id] = uniqueId;
+        return {
+          ...t,
+          id: uniqueId,
+          wedding_id: wedding.id
+        };
+      });
+
+      const migratedGuests = savedGuests.map(g => {
+        const uniqueId = 'g_' + Math.random().toString(36).substring(2, 9) + Date.now().toString().slice(-4);
+        const uniqueTableId = g.tableId ? (tableIdMap[g.tableId] || g.tableId) : null;
+        return {
+          ...g,
+          id: uniqueId,
           wedding_id: wedding.id,
+          tableId: uniqueTableId
+        };
+      });
+
+      const migratedBudget = savedBudget.map(b => {
+        const uniqueId = 'b_' + Math.random().toString(36).substring(2, 9) + Date.now().toString().slice(-4);
+        return {
+          ...b,
+          id: uniqueId,
+          wedding_id: wedding.id
+        };
+      });
+
+      const migratedEvents = savedEvents.map(e => {
+        const uniqueId = 'e_' + Math.random().toString(36).substring(2, 9) + Date.now().toString().slice(-4);
+        return {
+          ...e,
+          id: uniqueId,
+          wedding_id: wedding.id
+        };
+      });
+
+      // Insertar primero las mesas si existen para evitar violaciones de clave ajena
+      if (migratedTables.length > 0) {
+        const { error: tError } = await supabase.from('tables').insert(migratedTables.map(t => ({
+          id: t.id,
+          wedding_id: t.wedding_id,
+          name: t.name,
+          capacity: t.capacity
+        })));
+        if (tError) throw tError;
+      }
+
+      const uploads = [];
+      if (migratedBudget.length > 0) {
+        uploads.push(supabase.from('budget_items').insert(migratedBudget.map(b => ({
+          id: b.id,
+          wedding_id: b.wedding_id,
           category: b.category,
           name: b.name,
           estimated: b.estimated,
@@ -259,18 +311,10 @@ export default function App() {
           paid: b.paid
         }))));
       }
-      if (savedTables.length > 0) {
-        uploads.push(supabase.from('tables').insert(savedTables.map(t => ({
-          id: t.id,
-          wedding_id: wedding.id,
-          name: t.name,
-          capacity: t.capacity
-        }))));
-      }
-      if (savedGuests.length > 0) {
-        uploads.push(supabase.from('guests').insert(savedGuests.map(g => ({
+      if (migratedGuests.length > 0) {
+        uploads.push(supabase.from('guests').insert(migratedGuests.map(g => ({
           id: g.id,
-          wedding_id: wedding.id,
+          wedding_id: g.wedding_id,
           name: g.name,
           side: g.side,
           diet: g.diet,
@@ -279,10 +323,10 @@ export default function App() {
           is_child: g.isChild
         }))));
       }
-      if (savedEvents.length > 0) {
-        uploads.push(supabase.from('events').insert(savedEvents.map(e => ({
+      if (migratedEvents.length > 0) {
+        uploads.push(supabase.from('events').insert(migratedEvents.map(e => ({
           id: e.id,
-          wedding_id: wedding.id,
+          wedding_id: e.wedding_id,
           title: e.title,
           date: e.date,
           time: e.time,
@@ -292,13 +336,16 @@ export default function App() {
         }))));
       }
 
-      await Promise.all(uploads);
+      const uploadResults = await Promise.all(uploads);
+      for (const res of uploadResults) {
+        if (res.error) throw res.error;
+      }
 
       setWeddingData(formattedWedding);
-      setBudgetItems(savedBudget);
-      setTables(savedTables);
-      setGuests(savedGuests);
-      setEvents(savedEvents);
+      setBudgetItems(migratedBudget);
+      setTables(migratedTables);
+      setGuests(migratedGuests);
+      setEvents(migratedEvents);
 
       localStorage.clear();
       setOnboarded(true);
@@ -343,12 +390,72 @@ export default function App() {
         style: newWedding.style || 'classic'
       };
 
-      const defaultBudget = DEFAULT_BUDGET_ITEMS(finalWeddingData.budget).map(b => ({ ...b, wedding_id: newWedding.id }));
-      const defaultGuestsList = DEFAULT_GUESTS.map(g => ({ ...g, wedding_id: newWedding.id }));
-      const defaultTablesList = DEFAULT_TABLES.map(t => ({ ...t, wedding_id: newWedding.id }));
-      const defaultEventsList = DEFAULT_EVENTS(finalWeddingData.date).map(e => ({ ...e, wedding_id: newWedding.id }));
+      // Generar IDs únicos para evitar colisiones de clave primaria (id es TEXT PRIMARY KEY en Supabase)
+      const tableIdMap = {};
+      const defaultTablesList = DEFAULT_TABLES.map(t => {
+        const uniqueId = 't_' + Math.random().toString(36).substring(2, 9) + Date.now().toString().slice(-4);
+        tableIdMap[t.id] = uniqueId;
+        return {
+          id: uniqueId,
+          wedding_id: newWedding.id,
+          name: t.name,
+          capacity: t.capacity
+        };
+      });
 
-      await Promise.all([
+      const defaultGuestsList = DEFAULT_GUESTS.map(g => {
+        const uniqueId = 'g_' + Math.random().toString(36).substring(2, 9) + Date.now().toString().slice(-4);
+        const uniqueTableId = g.tableId ? (tableIdMap[g.tableId] || null) : null;
+        return {
+          id: uniqueId,
+          wedding_id: newWedding.id,
+          name: g.name,
+          side: g.side,
+          diet: g.diet,
+          status: g.status,
+          tableId: uniqueTableId,
+          isChild: g.isChild
+        };
+      });
+
+      const defaultBudget = DEFAULT_BUDGET_ITEMS(finalWeddingData.budget).map(b => {
+        const uniqueId = 'b_' + Math.random().toString(36).substring(2, 9) + Date.now().toString().slice(-4);
+        return {
+          id: uniqueId,
+          wedding_id: newWedding.id,
+          category: b.category,
+          name: b.name,
+          estimated: b.estimated,
+          actual: b.actual,
+          paid: b.paid
+        };
+      });
+
+      const defaultEventsList = DEFAULT_EVENTS(finalWeddingData.date).map(e => {
+        const uniqueId = 'e_' + Math.random().toString(36).substring(2, 9) + Date.now().toString().slice(-4);
+        return {
+          id: uniqueId,
+          wedding_id: newWedding.id,
+          title: e.title,
+          date: e.date,
+          time: e.time,
+          desc: e.desc,
+          category: e.category,
+          completed: e.completed
+        };
+      });
+
+      // 1. Insertar primero las mesas y esperar la confirmación de la base de datos
+      const { error: tError } = await supabase.from('tables').insert(defaultTablesList.map(t => ({
+        id: t.id,
+        wedding_id: t.wedding_id,
+        name: t.name,
+        capacity: t.capacity
+      })));
+      if (tError) throw tError;
+
+      // 2. Insertar el resto de datos de forma paralela
+      const [budgetRes, guestsRes, eventsRes] = await Promise.all([
         supabase.from('budget_items').insert(defaultBudget.map(b => ({
           id: b.id,
           wedding_id: b.wedding_id,
@@ -357,12 +464,6 @@ export default function App() {
           estimated: b.estimated,
           actual: b.actual,
           paid: b.paid
-        }))),
-        supabase.from('tables').insert(defaultTablesList.map(t => ({
-          id: t.id,
-          wedding_id: t.wedding_id,
-          name: t.name,
-          capacity: t.capacity
         }))),
         supabase.from('guests').insert(defaultGuestsList.map(g => ({
           id: g.id,
@@ -386,11 +487,15 @@ export default function App() {
         })))
       ]);
 
+      if (budgetRes.error) throw budgetRes.error;
+      if (guestsRes.error) throw guestsRes.error;
+      if (eventsRes.error) throw eventsRes.error;
+
       setWeddingData(finalWeddingData);
-      setBudgetItems(DEFAULT_BUDGET_ITEMS(finalWeddingData.budget));
-      setGuests(DEFAULT_GUESTS);
-      setTables(DEFAULT_TABLES);
-      setEvents(DEFAULT_EVENTS(finalWeddingData.date));
+      setBudgetItems(defaultBudget);
+      setGuests(defaultGuestsList);
+      setTables(defaultTablesList);
+      setEvents(defaultEventsList);
       setOnboarded(true);
       setActiveTab('dashboard');
     } catch (err) {

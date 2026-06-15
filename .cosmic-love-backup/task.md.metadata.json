@@ -1,5 +1,5 @@
 {
   "artifactType": "ARTIFACT_TYPE_TASK",
-  "summary": "Task checklist for implementing the onboarding guide carrusel.",
-  "updatedAt": "2026-06-14T21:35:17.965615900Z"
+  "summary": "List of tasks to fix the database synchronization race condition when inserting tables and guests in App.jsx.",
+  "updatedAt": "2026-06-15T23:01:55.441704500Z"
 }

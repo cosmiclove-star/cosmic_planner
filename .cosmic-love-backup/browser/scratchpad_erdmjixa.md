@@ -1,0 +1,8 @@
+- Navigated to http://localhost:5173/
+- Found multiple page IDs.
+- Page B4783C64D48FE3AD79ED64E3EB2494C0 is loading.
+- Will try to wait and retrieve its DOM again.
+- Page B4783C64D48FE3AD79ED64E3EB2494C0 loaded.
+- Viewport size is 500x707, but window size is 390x800.
+- DOM coordinate (737, 487) maps to X_pixel=368.5, Y_pixel=344.3.
+- To click this on 390x800 window, we need X = 945, Y = 430.

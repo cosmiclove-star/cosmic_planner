@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Design and implementation details for the welcome walkthrough modal with slide navigation, auto-open behaviour on first onboarding, and redirection to the Agenda tab on completion.",
+  "updatedAt": "2026-06-14T21:35:07.798454900Z",
+  "requestFeedback": true
+}

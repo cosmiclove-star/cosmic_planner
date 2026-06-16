@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, Search, Check, X, AlertTriangle, Users, Filter } from 'lucide-react';
+import { Plus, Trash2, Search, Check, X, AlertTriangle, Users, Filter, Download, Gift } from 'lucide-react';
 
 export default function GuestListManager({ guests, setGuests, weddingData = {} }) {
   const [newGuest, setNewGuest] = useState({
@@ -24,7 +24,9 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
       diet: newGuest.diet.trim(),
       status: newGuest.status,
       isChild: newGuest.isChild,
-      tableId: null // Se asignará en el seating plan
+      tableId: null, // Se asignará en el seating plan
+      giftDesc: '',
+      giftAmount: 0
     };
 
     setGuests([...guests, guest]);
@@ -50,6 +52,52 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
     }));
   };
 
+  const handleUpdateGift = (id, newDesc, newAmount) => {
+    setGuests(guests.map(g => {
+      if (g.id === id) {
+        return { ...g, giftDesc: newDesc, giftAmount: newAmount };
+      }
+      return g;
+    }));
+  };
+
+  const handleExportCSV = () => {
+    let csvContent = "\uFEFF"; // UTF-8 BOM
+    const headers = ["Nombre", "Familia (Lado)", "Dieta / Alergia", "Menú Infantil", "Mesa asignada", "Estado Asistencia", "Descripción Regalo", "Importe Regalo (€)"];
+    csvContent += headers.join(";") + "\r\n";
+    
+    guests.forEach(g => {
+      const row = [
+        g.name,
+        g.side,
+        g.diet || "-",
+        g.isChild ? "Sí" : "No",
+        g.tableId || "Sin asignar",
+        g.status === 'confirmed' ? "Confirmado" : g.status === 'pending' ? "Pendiente" : "No asiste",
+        g.giftDesc || "-",
+        (g.giftAmount || 0).toString().replace('.', ',')
+      ];
+      const escapedRow = row.map(val => {
+        let clean = val.toString().replace(/"/g, '""');
+        if (clean.includes(';') || clean.includes('\n') || clean.includes('\r') || clean.includes('"')) {
+          clean = `"${clean}"`;
+        }
+        return clean;
+      });
+      csvContent += escapedRow.join(";") + "\r\n";
+    });
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `invitados_y_regalos_cosmic_love.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   // Filtrado de invitados
   const filteredGuests = guests.filter(g => {
     const query = searchTerm.toLowerCase().trim();
@@ -70,9 +118,10 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
   const totalGuests = guests.length;
   const confirmedCount = guests.filter(g => g.status === 'confirmed').length;
   const pendingCount = guests.filter(g => g.status === 'pending').length;
-  const declinedCount = guests.filter(g => g.status === 'declined').length;
   const dietCount = guests.filter(g => g.diet).length;
   const childCount = guests.filter(g => g.isChild).length;
+  const totalGiftsAmount = guests.reduce((sum, g) => sum + (g.giftAmount || 0), 0);
+  const guestsWithGiftsCount = guests.filter(g => (g.giftDesc && g.giftDesc.trim() !== '') || (g.giftAmount && g.giftAmount > 0)).length;
 
   return (
     <div className="guest-view fade-in">
@@ -96,6 +145,14 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
         <div className="summary-card card">
           <span className="summary-label">Pendientes</span>
           <div className="summary-value">{pendingCount}</div>
+        </div>
+
+        <div className="summary-card card select-ink">
+          <span className="summary-label">Regalos Recibidos</span>
+          <div className="summary-value" style={{ color: 'var(--gold-hover)' }}>{totalGiftsAmount.toLocaleString('es-ES')} €</div>
+          <span className="summary-footer" style={{ fontSize: '10px', color: 'var(--muted)', marginTop: '4px' }}>
+            {guestsWithGiftsCount} regalos registrados
+          </span>
         </div>
 
         <div className="summary-card card">
@@ -185,7 +242,17 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
 
         {/* Listado con Filtros */}
         <div className="card guest-list-panel">
-          <h3 style={{ marginBottom: '20px' }}>Invitados ({filteredGuests.length})</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--line)', paddingBottom: '14px', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+            <h3 style={{ borderBottom: 'none', paddingBottom: 0, marginBottom: 0, fontSize: '20px' }}>Invitados ({filteredGuests.length})</h3>
+            <button 
+              type="button" 
+              onClick={handleExportCSV} 
+              className="btn btn-secondary btn-export-excel"
+              title="Descargar lista de invitados en un archivo Excel (CSV)"
+            >
+              <Download size={12} /> Exportar Lista
+            </button>
+          </div>
 
           {/* Barra Unificada de Búsqueda y Filtros */}
           <div className="search-filters-bar">
@@ -237,6 +304,7 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
                     <th>Nombre</th>
                     <th>Lado</th>
                     <th>Dieta / Alergia</th>
+                    <th>Regalo / Aportación</th>
                     <th>Estado de Confirmación</th>
                     <th>Acción</th>
                   </tr>
@@ -265,6 +333,26 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
                         ) : (
                           <span className="text-light">-</span>
                         )}
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                          <input
+                            type="text"
+                            className="table-input"
+                            style={{ width: '120px', fontSize: '12.5px', padding: '6px 8px' }}
+                            placeholder="Ej. Ingreso, Vajilla..."
+                            value={g.giftDesc || ''}
+                            onChange={(e) => handleUpdateGift(g.id, e.target.value, g.giftAmount)}
+                          />
+                          <input
+                            type="number"
+                            className="table-input"
+                            style={{ width: '75px', fontSize: '12.5px', padding: '6px 8px', fontFamily: 'var(--font-serif)' }}
+                            placeholder="0 €"
+                            value={g.giftAmount || ''}
+                            onChange={(e) => handleUpdateGift(g.id, g.giftDesc, parseFloat(e.target.value) || 0)}
+                          />
+                        </div>
                       </td>
                       <td>
                         <div className="guest-status-actions">
@@ -331,7 +419,7 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
         /* Summary Grid */
         .guest-summary-grid {
           display: grid;
-          grid-template-columns: repeat(5, 1fr);
+          grid-template-columns: repeat(6, 1fr);
           gap: 20px;
           margin-bottom: 40px;
         }
@@ -356,10 +444,6 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
           }
           .guest-summary-grid > * {
             grid-column: span 2;
-          }
-          .guest-summary-grid > *:nth-child(4),
-          .guest-summary-grid > *:nth-child(5) {
-            grid-column: span 3;
           }
         }
         @media (max-width: 600px) {
@@ -639,6 +723,29 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
             display: none;
           }
           .guest-table td:nth-child(4) {
+            border-top: 1px dashed var(--line);
+            padding-top: 10px;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+          }
+          .guest-table td:nth-child(4)::before {
+            content: "Regalo / Aport.";
+            font-family: var(--font-sans);
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--muted);
+            letter-spacing: 0.05em;
+          }
+          .guest-table td:nth-child(4) .table-input {
+            width: auto !important;
+            flex: 1;
+            max-width: 100px;
+            padding: 4px 6px !important;
+          }
+          .guest-table td:nth-child(5) {
             border-top: 1px solid var(--line);
             padding-top: 12px;
             margin-top: 6px;
@@ -646,7 +753,7 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
             align-items: center;
             justify-content: space-between;
           }
-          .guest-table td:nth-child(4)::before {
+          .guest-table td:nth-child(5)::before {
             content: "Asistencia";
             font-family: var(--font-sans);
             font-size: 9px;
@@ -664,7 +771,7 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
             height: 32px;
             font-size: 13px;
           }
-          .guest-table td:nth-child(5) {
+          .guest-table td:nth-child(6) {
             position: absolute;
             top: 16px;
             right: 16px;

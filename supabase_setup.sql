@@ -44,7 +44,9 @@ CREATE TABLE IF NOT EXISTS public.guests (
     diet TEXT DEFAULT '',
     status TEXT NOT NULL DEFAULT 'pending', -- confirmed / pending / declined
     table_id TEXT REFERENCES public.tables(id) ON DELETE SET NULL,
-    is_child BOOLEAN DEFAULT false NOT NULL
+    is_child BOOLEAN DEFAULT false NOT NULL,
+    gift_desc TEXT DEFAULT '',
+    gift_amount NUMERIC(12, 2) DEFAULT 0.00
 );
 
 -- 5. Crear Tabla: events (Agenda y Tareas)

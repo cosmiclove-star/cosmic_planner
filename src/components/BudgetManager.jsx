@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Trash2, CheckCircle2, Circle, Euro, Sliders, AlertCircle, Download } from 'lucide-react';
 
-export default function BudgetManager({ budgetItems, setBudgetItems, totalBudget, setTotalBudget }) {
+export default function BudgetManager({ budgetItems, setBudgetItems, totalBudget, setTotalBudget, guests = [] }) {
   const [isEditingBudget, setIsEditingBudget] = useState(false);
   const [tempBudget, setTempBudget] = useState(totalBudget);
   const [itemToDelete, setItemToDelete] = useState(null);
@@ -128,8 +128,10 @@ export default function BudgetManager({ budgetItems, setBudgetItems, totalBudget
   const totalEstimated = budgetItems.reduce((acc, item) => acc + item.estimated, 0);
   const totalActual = budgetItems.reduce((acc, item) => acc + item.actual, 0);
   const totalPaid = budgetItems.reduce((acc, item) => acc + (item.paid ? item.actual : 0), 0);
+  const totalGifts = guests.reduce((acc, guest) => acc + (guest.giftAmount || 0), 0);
 
-  const budgetOver = totalActual > totalBudget;
+  const netAvailable = totalBudget + totalGifts - totalActual;
+  const budgetOver = totalActual > (totalBudget + totalGifts);
 
   const filteredItems = budgetItems.filter(item => {
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -208,13 +210,19 @@ export default function BudgetManager({ budgetItems, setBudgetItems, totalBudget
           </div>
           {budgetOver ? (
             <div className="budget-status-badge warning">
-              <AlertCircle size={11} className="inline-icon" /> Superado por {(totalActual - totalBudget).toLocaleString('es-ES')} €
+              <AlertCircle size={11} className="inline-icon" /> Superado por {(totalActual - (totalBudget + totalGifts)).toLocaleString('es-ES')} €
             </div>
           ) : (
             <div className="budget-status-badge success">
-              <span>Disponibles: {(totalBudget - totalActual).toLocaleString('es-ES')} €</span>
+              <span>Neto Disp.: {netAvailable.toLocaleString('es-ES')} €</span>
             </div>
           )}
+        </div>
+
+        <div className="summary-card card" style={{ borderLeft: '2px solid var(--green)' }}>
+          <span className="summary-label" style={{ color: 'var(--green)' }}>Regalos Recibidos</span>
+          <div className="summary-value" style={{ color: 'var(--green)', whiteSpace: 'nowrap' }}>{totalGifts.toLocaleString('es-ES')} €</div>
+          <span className="summary-footer">Aportado por los invitados</span>
         </div>
 
         <div className="summary-card card">
@@ -442,13 +450,16 @@ export default function BudgetManager({ budgetItems, setBudgetItems, totalBudget
         /* Summary Grid */
         .budget-summary-grid {
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
+          grid-template-columns: repeat(5, 1fr);
           gap: 20px;
           margin-bottom: 40px;
         }
         @media (max-width: 1000px) {
           .budget-summary-grid {
             grid-template-columns: repeat(2, 1fr);
+          }
+          .budget-summary-grid > *:first-child {
+            grid-column: span 2;
           }
         }
         @media (max-width: 600px) {

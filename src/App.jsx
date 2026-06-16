@@ -169,7 +169,9 @@ export default function App() {
             diet: g.diet,
             status: g.status,
             tableId: g.table_id,
-            isChild: g.is_child
+            isChild: g.is_child,
+            giftDesc: g.gift_desc || '',
+            giftAmount: Number(g.gift_amount || 0)
           })));
           setTables(tablesRes.data || []);
           setEvents((eventsRes.data || []).map(e => ({
@@ -322,7 +324,9 @@ export default function App() {
           diet: g.diet,
           status: g.status,
           table_id: g.tableId,
-          is_child: g.isChild
+          is_child: g.isChild,
+          gift_desc: g.giftDesc || '',
+          gift_amount: g.giftAmount || 0
         }))));
       }
       if (migratedEvents.length > 0) {
@@ -476,7 +480,9 @@ export default function App() {
           diet: g.diet,
           status: g.status,
           table_id: g.tableId,
-          is_child: g.isChild
+          is_child: g.isChild,
+          gift_desc: '',
+          gift_amount: 0
         }))),
         supabase.from('events').insert(defaultEventsList.map(e => ({
           id: e.id,
@@ -630,13 +636,15 @@ export default function App() {
           diet: a.diet,
           status: a.status,
           table_id: a.tableId,
-          is_child: a.isChild
+          is_child: a.isChild,
+          gift_desc: a.giftDesc || '',
+          gift_amount: a.giftAmount || 0
         }))).then();
       }
       
       const modified = next.filter(n => {
         const p = prev.find(item => item.id === n.id);
-        return p && (p.name !== n.name || p.side !== n.side || p.diet !== n.diet || p.status !== n.status || p.tableId !== n.tableId || p.isChild !== n.isChild);
+        return p && (p.name !== n.name || p.side !== n.side || p.diet !== n.diet || p.status !== n.status || p.tableId !== n.tableId || p.isChild !== n.isChild || p.giftDesc !== n.giftDesc || p.giftAmount !== n.giftAmount);
       });
       if (modified.length > 0) {
         modified.forEach(m => {
@@ -646,7 +654,9 @@ export default function App() {
             diet: m.diet,
             status: m.status,
             table_id: m.tableId,
-            is_child: m.isChild
+            is_child: m.isChild,
+            gift_desc: m.giftDesc || '',
+            gift_amount: m.giftAmount || 0
           }).eq('id', m.id).then();
         });
       }
@@ -863,6 +873,7 @@ export default function App() {
             setTotalBudget={(newBudget) => {
               handleSetWeddingData({ ...weddingData, budget: newBudget });
             }}
+            guests={guests}
           />
         )}
         {activeTab === 'guests' && (

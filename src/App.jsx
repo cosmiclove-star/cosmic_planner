@@ -791,19 +791,9 @@ export default function App() {
     <div className="portal-app">
       {/* Barra de Navegación Lateral Premium */}
       <aside className="portal-sidebar">
-        <button type="button" className="btn-logout-corner" onClick={handleLogout} title="Cerrar sesión">
-          <LogOut size={16} /> <span className="logout-text">Cerrar Sesión</span>
-        </button>
-
         <div className="sidebar-brand" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
           <img src="/logo.png" alt="Cosmic Love" className="sidebar-brand-img" style={{ maxHeight: '80px', width: 'auto', marginBottom: '12px', display: 'block' }} />
           <span>TU UNIVERSO DE BODA, ORDENADO.</span>
-        </div>
-
-        <div className="sidebar-footer">
-          <button type="button" className="btn-help-guide" onClick={() => setShowGuideModal(true)} title="Ver guía de bienvenida">
-            <HelpCircle size={14} /> Guía del Portal
-          </button>
         </div>
 
         <nav className="sidebar-nav">
@@ -841,6 +831,15 @@ export default function App() {
             <Compass size={16} /> Cosmic Selection
           </a>
         </nav>
+
+        <div className="sidebar-footer">
+          <button type="button" className="btn-help-guide" onClick={() => setShowGuideModal(true)} title="Ver guía de bienvenida">
+            <HelpCircle size={14} /> Guía del Portal
+          </button>
+          <button type="button" className="btn-logout-footer" onClick={handleLogout} title="Cerrar sesión">
+            <LogOut size={14} /> Cerrar Sesión
+          </button>
+        </div>
       </aside>
 
       {/* Contenido Principal de la Aplicación */}
@@ -1043,13 +1042,16 @@ export default function App() {
         
         .sidebar-footer {
           padding: 24px;
-          border-bottom: 1px solid var(--line);
+          border-top: 1px solid var(--line);
           display: flex;
           flex-direction: column;
           gap: 12px;
         }
         @media (max-width: 900px) {
           .sidebar-footer {
+            flex-direction: row;
+            justify-content: center;
+            gap: 24px;
             align-items: center;
             text-align: center;
             border-top: none;
@@ -1057,36 +1059,24 @@ export default function App() {
             padding: 16px;
           }
         }
-        .btn-logout-corner {
-          position: absolute;
-          top: 16px;
-          right: 16px;
+        .btn-logout-footer {
           background: none;
           border: none;
           color: var(--accent);
           font-family: var(--font-sans);
-          font-size: 11px;
-          font-weight: 600;
+          font-size: 10px;
+          font-weight: 500;
           letter-spacing: 0.05em;
           text-transform: uppercase;
           cursor: pointer;
+          text-align: left;
           display: flex;
           align-items: center;
           gap: 6px;
           transition: var(--transition);
-          z-index: 10;
         }
-        .btn-logout-corner:hover {
+        .btn-logout-footer:hover {
           color: var(--red);
-        }
-        @media (max-width: 600px) {
-          .btn-logout-corner {
-            top: 14px;
-            right: 14px;
-          }
-          .btn-logout-corner .logout-text {
-            display: none;
-          }
         }
         .btn-help-guide {
           background: none;

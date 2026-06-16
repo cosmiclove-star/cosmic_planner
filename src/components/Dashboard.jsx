@@ -98,7 +98,7 @@ export default function Dashboard({ data, guests, budgetItems, activeTab, setAct
 
   const totalGuestsCount = guests.length;
   const confirmedGuests = guests.filter(g => g.status === 'confirmed').length;
-  const guestPercentage = Math.round((confirmedGuests / (data.guests || 1)) * 100) || 0;
+  const guestPercentage = Math.round((confirmedGuests / (data.guests || 120)) * 100) || 0;
 
   const totalEvents = events.length;
   const completedEvents = events.filter(e => e.completed).length;
@@ -180,7 +180,7 @@ export default function Dashboard({ data, guests, budgetItems, activeTab, setAct
             <Users className="metric-icon" size={18} />
           </div>
           <div className="metric-value">{confirmedGuests}</div>
-          <div className="metric-subtext">de {data.guests} invitados estimados</div>
+          <div className="metric-subtext">de {data.guests || 120} invitados estimados</div>
           <div className="progress-bar">
             <div className="progress-fill" style={{ width: `${Math.min(guestPercentage, 100)}%` }}></div>
           </div>
@@ -701,14 +701,16 @@ export default function Dashboard({ data, guests, budgetItems, activeTab, setAct
         }
         .metric-title {
           font-family: var(--font-sans);
-          font-size: 10px;
+          font-size: 13px;
           font-weight: 600;
-          letter-spacing: 0.1em;
+          letter-spacing: 0.15em;
           text-transform: uppercase;
           color: var(--muted);
         }
         .metric-icon {
           color: var(--accent);
+          width: 22px !important;
+          height: 22px !important;
         }
         .metric-value {
           font-size: 32px;
@@ -952,6 +954,13 @@ export default function Dashboard({ data, guests, budgetItems, activeTab, setAct
         @media (max-width: 600px) {
           .metric-card {
             padding: 16px 14px !important;
+          }
+          .metric-card .metric-title {
+            font-size: 10px !important;
+          }
+          .metric-card .metric-icon {
+            width: 18px !important;
+            height: 18px !important;
           }
           .metric-card .metric-value {
             font-size: 20px !important;

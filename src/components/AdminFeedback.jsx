@@ -146,8 +146,8 @@ export default function AdminFeedback() {
             <strong>Atención:</strong> {error}
             <div className="sql-instructions">
               <p>Ejecuta el siguiente código en el SQL Editor de tu Supabase para dar permisos:</p>
-              <code>{`CREATE POLICY "Admins can select feedback" ON public.feedback FOR SELECT TO authenticated USING (auth.jwt() ->> 'email' = 'test@example.com' OR auth.jwt() ->> 'email' LIKE '%@cosmiclove.es');
-CREATE POLICY "Admins can delete feedback" ON public.feedback FOR DELETE TO authenticated USING (auth.jwt() ->> 'email' = 'test@example.com' OR auth.jwt() ->> 'email' LIKE '%@cosmiclove.es');`}</code>
+              <code>{`CREATE POLICY "Admins can select feedback" ON public.feedback FOR SELECT TO authenticated USING (auth.jwt() ->> 'email' = 'test@example.com' OR auth.jwt() ->> 'email' = 'labodadecloe@gmail.com' OR auth.jwt() ->> 'email' LIKE '%@cosmiclove.es');
+CREATE POLICY "Admins can delete feedback" ON public.feedback FOR DELETE TO authenticated USING (auth.jwt() ->> 'email' = 'test@example.com' OR auth.jwt() ->> 'email' = 'labodadecloe@gmail.com' OR auth.jwt() ->> 'email' LIKE '%@cosmiclove.es');`}</code>
             </div>
           </div>
         </div>

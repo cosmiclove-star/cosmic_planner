@@ -78,7 +78,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showGuideModal, setShowGuideModal] = useState(false);
 
-  const isAdmin = session?.user?.email === 'test@example.com' || session?.user?.email?.endsWith('@cosmiclove.es');
+  const isAdmin = session?.user?.email === 'test@example.com' || session?.user?.email === 'labodadecloe@gmail.com' || session?.user?.email?.endsWith('@cosmiclove.es');
 
   const [budgetItems, setBudgetItems] = useState([]);
   const [guests, setGuests] = useState([]);

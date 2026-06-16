@@ -574,9 +574,14 @@ export default function CalendarPlanner({ events, setEvents, weddingDate }) {
                         )}
 
                         {isWeddingDay && (
-                          <div className="wedding-day-label">
-                            💍 ¡Boda!
-                          </div>
+                          <>
+                            <div className="wedding-sparkle s1">✨</div>
+                            <div className="wedding-sparkle s2">🎉</div>
+                            <div className="wedding-sparkle s3">✨</div>
+                            <div className="wedding-day-label">
+                              💍 ¡Nuestra Boda!
+                            </div>
+                          </>
                         )}
                       </div>
                     </>
@@ -1156,7 +1161,7 @@ export default function CalendarPlanner({ events, setEvents, weddingDate }) {
         .calendar-grid {
           display: grid;
           grid-template-columns: repeat(7, 1fr);
-          grid-auto-rows: 120px;
+          grid-auto-rows: 130px;
           border-top: 1px solid var(--line);
           border-left: 1px solid var(--line);
         }
@@ -1178,9 +1183,42 @@ export default function CalendarPlanner({ events, setEvents, weddingDate }) {
           background-color: rgba(245, 240, 232, 0.2);
         }
         .calendar-day-cell.wedding-day {
-          background-color: rgba(197, 168, 128, 0.08);
-          box-shadow: inset 0 0 0 2px var(--gold);
+          background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(255, 255, 255, 0.95) 50%, rgba(212, 175, 55, 0.1) 100%) !important;
+          background-size: 200% 200% !important;
+          animation: shimmerBg 6s ease infinite !important;
+          box-shadow: inset 0 0 0 2px #d4af37 !important;
           z-index: 2;
+        }
+        @keyframes shimmerBg {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        .wedding-sparkle {
+          position: absolute;
+          font-size: 14px;
+          pointer-events: none;
+          opacity: 0.8;
+          z-index: 5;
+        }
+        .wedding-sparkle.s1 {
+          top: 8px;
+          right: 12px;
+          animation: floatSparkle 3s ease-in-out infinite alternate;
+        }
+        .wedding-sparkle.s2 {
+          top: 35px;
+          left: 8px;
+          animation: floatSparkle 2.5s ease-in-out infinite alternate-reverse;
+        }
+        .wedding-sparkle.s3 {
+          bottom: 35px;
+          right: 8px;
+          animation: floatSparkle 4s ease-in-out infinite alternate;
+        }
+        @keyframes floatSparkle {
+          0% { transform: translateY(0) scale(0.8) rotate(0deg); opacity: 0.4; }
+          100% { transform: translateY(-6px) scale(1.2) rotate(15deg); opacity: 1; }
         }
         .calendar-day-cell.has-events {
           cursor: pointer;
@@ -1218,10 +1256,10 @@ export default function CalendarPlanner({ events, setEvents, weddingDate }) {
           flex: 1;
         }
         .calendar-event-item {
-          font-size: 9px;
-          padding: 2px 4px;
+          font-size: 11px;
+          padding: 4px 6px;
           background-color: var(--cream);
-          border-left: 2px solid var(--accent);
+          border-left: 3px solid var(--accent);
           color: var(--ink);
           text-decoration: none;
           white-space: nowrap;
@@ -1229,7 +1267,12 @@ export default function CalendarPlanner({ events, setEvents, weddingDate }) {
           text-overflow: ellipsis;
           font-weight: 500;
           cursor: pointer;
+          border-radius: 3px;
           transition: var(--transition);
+        }
+        .calendar-event-item:hover {
+          transform: translateY(-0.5px);
+          box-shadow: var(--shadow-subtle);
         }
         .calendar-event-item.completed {
           background-color: rgba(99, 125, 101, 0.08);
@@ -1253,20 +1296,35 @@ export default function CalendarPlanner({ events, setEvents, weddingDate }) {
         }
         .wedding-day-label {
           font-family: var(--font-serif);
-          font-size: 9px;
-          font-weight: 600;
-          color: var(--gold-hover);
+          font-size: 11px;
+          font-weight: 700;
+          color: var(--white) !important;
           text-align: center;
           margin-top: auto;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 4px;
-          background-color: var(--white);
-          border: 1px solid var(--gold);
-          padding: 3px 2px;
-          width: 100%;
-          box-shadow: var(--shadow-subtle);
+          gap: 5px;
+          background: linear-gradient(135deg, #d4af37 0%, #aa7c11 100%) !important;
+          border: none !important;
+          border-radius: 4px !important;
+          padding: 6px 8px !important;
+          width: 100% !important;
+          box-shadow: 0 4px 10px rgba(170, 124, 17, 0.3) !important;
+          letter-spacing: 0.05em;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+          animation: pulseGold 2s infinite alternate;
+          z-index: 4;
+        }
+        @keyframes pulseGold {
+          0% {
+            box-shadow: 0 2px 6px rgba(170, 124, 17, 0.2);
+            transform: scale(1);
+          }
+          100% {
+            box-shadow: 0 6px 15px rgba(170, 124, 17, 0.5);
+            transform: scale(1.03);
+          }
         }
 
         /* Adaptación responsiva del calendario mensual en móvil */
@@ -1309,8 +1367,12 @@ export default function CalendarPlanner({ events, setEvents, weddingDate }) {
             background-color: var(--cream-dark);
           }
           .calendar-day-cell.wedding-day {
-            background-color: rgba(197, 168, 128, 0.15);
-            box-shadow: 0 0 0 2px var(--gold);
+            background: rgba(197, 168, 128, 0.15) !important;
+            animation: none !important;
+            box-shadow: 0 0 0 2px var(--gold) !important;
+          }
+          .wedding-sparkle {
+            display: none !important;
           }
           .day-number {
             margin-bottom: 2px;
@@ -1329,7 +1391,7 @@ export default function CalendarPlanner({ events, setEvents, weddingDate }) {
             font-weight: 700;
           }
           .wedding-day-label {
-            display: none;
+            display: none !important;
           }
           .calendar-day-events {
             flex-direction: row;

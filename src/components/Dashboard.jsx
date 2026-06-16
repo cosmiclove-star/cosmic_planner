@@ -240,7 +240,7 @@ export default function Dashboard({ data, guests, budgetItems, activeTab, setAct
         <div className="calendar-grid" style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(7, 1fr)',
-          gridAutoRows: '120px',
+          gridAutoRows: '130px',
           borderTop: '1px solid var(--line)',
           borderLeft: '1px solid var(--line)'
         }}>
@@ -289,24 +289,27 @@ export default function Dashboard({ data, guests, budgetItems, activeTab, setAct
                       {cell.day}
                     </span>
 
-                    <div className="calendar-day-events" style={{ display: 'flex', flexDirection: 'column', gap: '3px', overflow: 'hidden', flex: 1 }}>
+                    <div className="calendar-day-events" style={{ display: 'flex', flexDirection: 'column', gap: '4px', overflow: 'hidden', flex: 1 }}>
                       {cellEvents.slice(0, 2).map(e => (
                         <div
                           key={e.id}
                           className={`calendar-event-item ${e.completed ? 'completed' : ''}`}
                           title={`[${e.category}] ${e.title} - ${e.time}`}
                           style={{
-                            fontSize: '9px',
-                            padding: '2px 4px',
+                            fontSize: '11px',
+                            padding: '4px 6px',
                             backgroundColor: e.completed ? 'rgba(99, 125, 101, 0.08)' : 'var(--cream)',
-                            borderLeft: e.completed ? '2px solid var(--green)' : '2px solid var(--accent)',
+                            borderLeft: e.completed ? '3px solid var(--green)' : '3px solid var(--accent)',
                             color: e.completed ? 'var(--muted)' : 'var(--ink)',
                             textDecoration: e.completed ? 'line-through' : 'none',
                             whiteSpace: 'nowrap',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             fontWeight: '500',
-                            cursor: 'pointer'
+                            borderRadius: '3px',
+                            cursor: 'pointer',
+                            marginBottom: '2px',
+                            transition: 'var(--transition)'
                           }}
                           onClick={(evt) => {
                             evt.stopPropagation();
@@ -346,25 +349,14 @@ export default function Dashboard({ data, guests, budgetItems, activeTab, setAct
                       )}
 
                       {isWeddingDay && (
-                        <div className="wedding-day-label" style={{
-                          fontFamily: 'var(--font-serif)',
-                          fontSize: '9px',
-                          fontWeight: '600',
-                          color: 'var(--gold-hover)',
-                          textAlign: 'center',
-                          marginTop: 'auto',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '4px',
-                          backgroundColor: 'var(--white)',
-                          border: '1px solid var(--gold)',
-                          padding: '3px 2px',
-                          width: '100%',
-                          boxShadow: 'var(--shadow-subtle)'
-                        }}>
-                          💍 ¡Boda!
-                        </div>
+                        <>
+                          <div className="wedding-sparkle s1">✨</div>
+                          <div className="wedding-sparkle s2">🎉</div>
+                          <div className="wedding-sparkle s3">✨</div>
+                          <div className="wedding-day-label">
+                            💍 ¡Nuestra Boda!
+                          </div>
+                        </>
                       )}
                     </div>
                   </>
@@ -948,6 +940,77 @@ export default function Dashboard({ data, guests, budgetItems, activeTab, setAct
         .calendar-event-item:hover {
           transform: translateY(-0.5px);
           box-shadow: var(--shadow-subtle);
+        }
+
+        /* Estilos del día de boda (Shimmer y Sparkles) */
+        .calendar-day-cell.wedding-day {
+          background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(255, 255, 255, 0.95) 50%, rgba(212, 175, 55, 0.1) 100%) !important;
+          background-size: 200% 200% !important;
+          animation: shimmerBg 6s ease infinite !important;
+          box-shadow: inset 0 0 0 2px #d4af37 !important;
+        }
+        @keyframes shimmerBg {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        .wedding-sparkle {
+          position: absolute;
+          font-size: 14px;
+          pointer-events: none;
+          opacity: 0.8;
+          z-index: 5;
+        }
+        .wedding-sparkle.s1 {
+          top: 8px;
+          right: 12px;
+          animation: floatSparkle 3s ease-in-out infinite alternate;
+        }
+        .wedding-sparkle.s2 {
+          top: 35px;
+          left: 8px;
+          animation: floatSparkle 2.5s ease-in-out infinite alternate-reverse;
+        }
+        .wedding-sparkle.s3 {
+          bottom: 35px;
+          right: 8px;
+          animation: floatSparkle 4s ease-in-out infinite alternate;
+        }
+        @keyframes floatSparkle {
+          0% { transform: translateY(0) scale(0.8) rotate(0deg); opacity: 0.4; }
+          100% { transform: translateY(-6px) scale(1.2) rotate(15deg); opacity: 1; }
+        }
+        .wedding-day-label {
+          font-family: var(--font-serif);
+          font-size: 11px;
+          font-weight: 700;
+          color: var(--white) !important;
+          text-align: center;
+          margin-top: auto;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 5px;
+          background: linear-gradient(135deg, #d4af37 0%, #aa7c11 100%) !important;
+          border: none !important;
+          border-radius: 4px !important;
+          padding: 6px 8px !important;
+          width: 100% !important;
+          box-shadow: 0 4px 10px rgba(170, 124, 17, 0.3) !important;
+          letter-spacing: 0.05em;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+          animation: pulseGold 2s infinite alternate;
+          z-index: 4;
+        }
+        @keyframes pulseGold {
+          0% {
+            box-shadow: 0 2px 6px rgba(170, 124, 17, 0.2);
+            transform: scale(1);
+          }
+          100% {
+            box-shadow: 0 6px 15px rgba(170, 124, 17, 0.5);
+            transform: scale(1.03);
+          }
         }
 
         /* Mobile responsive overrides for the monthly calendar */

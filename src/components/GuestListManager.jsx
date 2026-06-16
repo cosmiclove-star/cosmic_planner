@@ -208,15 +208,15 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
               />
             </div>
 
-            <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '20px 0' }}>
+            <div className="form-group child-checkbox-group">
               <input
                 type="checkbox"
                 id="newGuestIsChild"
-                style={{ width: '16px', height: '16px', accentColor: 'var(--ink)', cursor: 'pointer' }}
+                className="checkbox-input"
                 checked={newGuest.isChild}
                 onChange={(e) => setNewGuest({ ...newGuest, isChild: e.target.checked })}
               />
-              <label htmlFor="newGuestIsChild" className="form-label" style={{ marginBottom: 0, cursor: 'pointer', textTransform: 'none', fontSize: '11px', letterSpacing: '0.05em', color: 'var(--ink)' }}>
+              <label htmlFor="newGuestIsChild" className="checkbox-label">
                 Es un niño/a (Menú Infantil)
               </label>
             </div>
@@ -304,8 +304,8 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
                     <th>Nombre</th>
                     <th>Lado</th>
                     <th>Dieta / Alergia</th>
-                    <th>Regalo / Aportación</th>
                     <th>Estado de Confirmación</th>
+                    <th>Regalo / Aportación</th>
                     <th>Acción</th>
                   </tr>
                 </thead>
@@ -335,26 +335,6 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
                         )}
                       </td>
                       <td>
-                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                          <input
-                            type="text"
-                            className="table-input"
-                            style={{ width: '120px', fontSize: '12.5px', padding: '6px 8px' }}
-                            placeholder="Ej. Ingreso, Vajilla..."
-                            value={g.giftDesc || ''}
-                            onChange={(e) => handleUpdateGift(g.id, e.target.value, g.giftAmount)}
-                          />
-                          <input
-                            type="number"
-                            className="table-input"
-                            style={{ width: '75px', fontSize: '12.5px', padding: '6px 8px', fontFamily: 'var(--font-serif)' }}
-                            placeholder="0 €"
-                            value={g.giftAmount || ''}
-                            onChange={(e) => handleUpdateGift(g.id, g.giftDesc, parseFloat(e.target.value) || 0)}
-                          />
-                        </div>
-                      </td>
-                      <td>
                         <div className="guest-status-actions">
                           <button
                             type="button"
@@ -380,6 +360,26 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
                           >
                             <X size={12} />
                           </button>
+                        </div>
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                          <input
+                            type="text"
+                            className="table-input"
+                            style={{ width: '120px', fontSize: '12.5px', padding: '6px 8px' }}
+                            placeholder="Ej. Ingreso, Vajilla..."
+                            value={g.giftDesc || ''}
+                            onChange={(e) => handleUpdateGift(g.id, e.target.value, g.giftAmount)}
+                          />
+                          <input
+                            type="number"
+                            className="table-input"
+                            style={{ width: '75px', fontSize: '12.5px', padding: '6px 8px', fontFamily: 'var(--font-serif)' }}
+                            placeholder="0 €"
+                            value={g.giftAmount || ''}
+                            onChange={(e) => handleUpdateGift(g.id, g.giftDesc, parseFloat(e.target.value) || 0)}
+                          />
                         </div>
                       </td>
                       <td>
@@ -472,13 +472,8 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
         /* Layout */
         .guest-main-grid {
           display: grid;
-          grid-template-columns: 1fr 2.5fr;
+          grid-template-columns: 1fr;
           gap: 24px;
-        }
-        @media (max-width: 950px) {
-          .guest-main-grid {
-            grid-template-columns: 1fr;
-          }
         }
         .add-guest-panel h3, .guest-list-panel h3 {
           font-size: 20px;
@@ -486,9 +481,55 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
           padding-bottom: 14px;
           margin-bottom: 20px;
         }
+        
+        /* Formulario Añadir Invitado en Rejilla Horaria en Desktop */
         .guest-form {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 20px;
+          align-items: end;
+        }
+        .guest-form .form-group {
+          margin-bottom: 0;
+        }
+        .guest-form .form-group:nth-child(1) { /* Nombre Completo */
+          grid-column: span 2;
+        }
+        .guest-form .form-group:nth-child(2) { /* Lado de la familia */
+          grid-column: span 1;
+        }
+        .guest-form .form-group:nth-child(5) { /* Estado Inicial */
+          grid-column: span 1;
+        }
+        .guest-form .form-group:nth-child(3) { /* Alergias o Restricciones */
+          grid-column: span 2;
+        }
+        .guest-form .child-checkbox-group { /* Es un niño/a */
+          grid-column: span 1;
           display: flex;
-          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+          height: 42px;
+        }
+        .checkbox-input {
+          width: 16px;
+          height: 16px;
+          accent-color: var(--ink);
+          cursor: pointer;
+        }
+        .checkbox-label {
+          margin-bottom: 0 !important;
+          cursor: pointer !important;
+          text-transform: none !important;
+          font-size: 11px !important;
+          letter-spacing: 0.05em !important;
+          color: var(--ink) !important;
+          font-family: var(--font-sans);
+          font-weight: 600;
+        }
+        .guest-form .btn-full { /* Botón */
+          grid-column: span 1;
+          height: 42px;
         }
         
         /* Barra de Búsqueda y Filtros Unificada */
@@ -598,7 +639,50 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
           }
         }
 
-        /* Elementos de Tabla */
+        /* Tabla de Invitados (Desktop) */
+        .table-responsive {
+          width: 100%;
+          overflow-x: auto;
+        }
+        .guest-table {
+          width: 100%;
+          border-collapse: collapse;
+          text-align: left;
+        }
+        .guest-table th {
+          font-family: var(--font-sans);
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: var(--muted);
+          padding: 16px 20px;
+          border-bottom: 1px solid var(--line);
+        }
+        .guest-table td {
+          padding: 16px 20px;
+          border-bottom: 1px solid var(--line);
+          font-size: 13px;
+          vertical-align: middle;
+        }
+        .guest-table th:first-child,
+        .guest-table td:first-child {
+          padding-left: 0;
+        }
+        .guest-table th:last-child,
+        .guest-table td:last-child {
+          padding-right: 0;
+          text-align: right;
+        }
+
+        /* Distribución visual con espacio holgado y limpio (Desktop) */
+        .guest-table th:nth-child(1), .guest-table td:nth-child(1) { width: 25%; min-width: 180px; } /* Nombre */
+        .guest-table th:nth-child(2), .guest-table td:nth-child(2) { width: 12%; min-width: 90px; }  /* Lado */
+        .guest-table th:nth-child(3), .guest-table td:nth-child(3) { width: 20%; min-width: 150px; } /* Dieta */
+        .guest-table th:nth-child(4), .guest-table td:nth-child(4) { width: 18%; min-width: 130px; } /* Confirmación */
+        .guest-table th:nth-child(5), .guest-table td:nth-child(5) { width: 20%; min-width: 220px; } /* Regalo */
+        .guest-table th:nth-child(6), .guest-table td:nth-child(6) { width: 5%; min-width: 50px; }   /* Acción */
+
         .guest-name-cell {
           font-weight: 500;
           color: var(--ink);
@@ -632,11 +716,11 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
         }
         .guest-status-actions {
           display: flex;
-          gap: 6px;
+          gap: 8px;
         }
         .status-btn {
-          width: 24px;
-          height: 24px;
+          width: 28px;
+          height: 28px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -644,7 +728,7 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
           background-color: var(--white);
           cursor: pointer;
           font-family: var(--font-sans);
-          font-size: 11px;
+          font-size: 12px;
           color: var(--muted);
           transition: var(--transition);
         }
@@ -668,6 +752,29 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
           font-style: italic;
         }
         @media (max-width: 768px) {
+          .guest-form {
+            grid-template-columns: 1fr;
+            gap: 16px;
+          }
+          .guest-form .form-group {
+            margin-bottom: 20px;
+          }
+          .guest-form .form-group:nth-child(1),
+          .guest-form .form-group:nth-child(2),
+          .guest-form .form-group:nth-child(3),
+          .guest-form .form-group:nth-child(4),
+          .guest-form .form-group:nth-child(5),
+          .guest-form .btn-full {
+            grid-column: span 1;
+          }
+          .guest-form .child-checkbox-group {
+            margin-bottom: 20px;
+            height: auto;
+          }
+          .guest-form .btn-full {
+            height: auto;
+          }
+
           .table-responsive {
             overflow-x: visible;
           }
@@ -676,7 +783,7 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
           }
           .guest-table, .guest-table tbody, .guest-table tr, .guest-table td {
             display: block;
-            width: 100%;
+            width: 100% !important;
           }
           .guest-table tr {
             border: 1px solid var(--line);
@@ -713,47 +820,25 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
           .guest-table td:nth-child(2) {
             display: inline-block;
             margin-right: 8px;
-            width: auto;
+            width: auto !important;
           }
           .guest-table td:nth-child(3) {
             display: inline-block;
-            width: auto;
+            width: auto !important;
           }
           .guest-table td:nth-child(3) .text-light {
             display: none;
           }
           .guest-table td:nth-child(4) {
-            border-top: 1px dashed var(--line);
-            padding-top: 10px;
-            margin-top: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-          }
-          .guest-table td:nth-child(4)::before {
-            content: "Regalo / Aport.";
-            font-family: var(--font-sans);
-            font-size: 9px;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: var(--muted);
-            letter-spacing: 0.05em;
-          }
-          .guest-table td:nth-child(4) .table-input {
-            width: auto !important;
-            flex: 1;
-            max-width: 100px;
-            padding: 4px 6px !important;
-          }
-          .guest-table td:nth-child(5) {
             border-top: 1px solid var(--line);
             padding-top: 12px;
             margin-top: 6px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            width: 100% !important;
           }
-          .guest-table td:nth-child(5)::before {
+          .guest-table td:nth-child(4)::before {
             content: "Asistencia";
             font-family: var(--font-sans);
             font-size: 9px;
@@ -771,12 +856,36 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
             height: 32px;
             font-size: 13px;
           }
+          .guest-table td:nth-child(5) {
+            border-top: 1px dashed var(--line);
+            padding-top: 10px;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100% !important;
+          }
+          .guest-table td:nth-child(5)::before {
+            content: "Regalo / Aport.";
+            font-family: var(--font-sans);
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--muted);
+            letter-spacing: 0.05em;
+          }
+          .guest-table td:nth-child(5) .table-input {
+            width: auto !important;
+            flex: 1;
+            max-width: 100px;
+            padding: 4px 6px !important;
+          }
           .guest-table td:nth-child(6) {
             position: absolute;
             top: 16px;
             right: 16px;
             margin-bottom: 0;
-            width: auto;
+            width: auto !important;
           }
           .btn-delete {
             padding: 8px;

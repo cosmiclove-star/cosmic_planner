@@ -207,11 +207,13 @@ export default function BudgetManager({ budgetItems, setBudgetItems, totalBudget
             {totalActual.toLocaleString('es-ES')} €
           </div>
           {budgetOver ? (
-            <span className="summary-footer warning-text">
-              <AlertCircle size={10} className="inline-icon" /> Superado por {(totalActual - totalBudget).toLocaleString('es-ES')} €
-            </span>
+            <div className="budget-status-badge warning">
+              <AlertCircle size={11} className="inline-icon" /> Superado por {(totalActual - totalBudget).toLocaleString('es-ES')} €
+            </div>
           ) : (
-            <span className="summary-footer success-text">Disponibles {(totalBudget - totalActual).toLocaleString('es-ES')} €</span>
+            <div className="budget-status-badge success">
+              <span>Disponibles: {(totalBudget - totalActual).toLocaleString('es-ES')} €</span>
+            </div>
           )}
         </div>
 
@@ -475,6 +477,13 @@ export default function BudgetManager({ budgetItems, setBudgetItems, totalBudget
             padding: 2px 4px !important;
             width: 80px !important;
           }
+          .select-ink .summary-value {
+            font-size: 22px !important;
+          }
+          .budget-status-badge {
+            font-size: 9.5px !important;
+            padding: 4px 8px !important;
+          }
         }
         .summary-card {
           padding: 24px;
@@ -502,16 +511,39 @@ export default function BudgetManager({ budgetItems, setBudgetItems, totalBudget
           letter-spacing: 0.02em;
         }
         .select-ink {
-          background-color: var(--cream-dark);
-          border-color: var(--line);
+          background-color: #f7f3eb !important;
+          border: 2px solid var(--gold) !important;
+          box-shadow: 0 6px 16px rgba(170, 124, 17, 0.08) !important;
+          transform: translateY(-2px);
         }
-        .warning-text {
-          color: var(--red);
-          font-weight: 500;
+        .select-ink .summary-label {
+          color: var(--gold-hover) !important;
+          font-weight: 700;
         }
-        .success-text {
+        .select-ink .summary-value {
+          font-size: 32px;
+          font-weight: 700;
+        }
+        .budget-status-badge {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          padding: 6px 12px;
+          border-radius: 20px;
+          font-size: 11px;
+          font-weight: 600;
+          font-family: var(--font-sans);
+          margin-top: auto;
+          width: fit-content;
+        }
+        .budget-status-badge.success {
+          background-color: rgba(99, 125, 101, 0.12);
           color: var(--green);
-          font-weight: 500;
+        }
+        .budget-status-badge.warning {
+          background-color: rgba(217, 83, 79, 0.12);
+          color: var(--red);
         }
         .inline-icon {
           display: inline;

@@ -143,6 +143,7 @@ export default function App() {
             date: wedding.date,
             budget: Number(wedding.budget),
             city: wedding.city,
+            location: wedding.city || '',
             style: wedding.style || 'classic'
           };
           setWeddingData(formattedWedding);
@@ -243,6 +244,7 @@ export default function App() {
         date: wedding.date,
         budget: Number(wedding.budget),
         city: wedding.city,
+        location: wedding.city || '',
         style: wedding.style || 'classic'
       };
 
@@ -372,7 +374,7 @@ export default function App() {
           couple_name2: data.coupleName2,
           date: weddingDate,
           budget: data.budget,
-          city: data.city || '',
+          city: data.location || data.city || '',
           style: data.style || 'classic'
         }])
         .select()
@@ -387,6 +389,7 @@ export default function App() {
         date: newWedding.date,
         budget: Number(newWedding.budget),
         city: newWedding.city,
+        location: newWedding.city || '',
         style: newWedding.style || 'classic'
       };
 

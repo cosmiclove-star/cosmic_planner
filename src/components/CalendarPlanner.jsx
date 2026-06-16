@@ -576,10 +576,10 @@ export default function CalendarPlanner({ events, setEvents, weddingDate }) {
                         {isWeddingDay && (
                           <>
                             <div className="wedding-sparkle s1">✨</div>
-                            <div className="wedding-sparkle s2">🎉</div>
+                            <div className="wedding-sparkle s2">✨</div>
                             <div className="wedding-sparkle s3">✨</div>
                             <div className="wedding-day-label">
-                              💍 ¡Nuestra Boda!
+                              ¡Nuestra Boda!
                             </div>
                           </>
                         )}
@@ -1183,42 +1183,36 @@ export default function CalendarPlanner({ events, setEvents, weddingDate }) {
           background-color: rgba(245, 240, 232, 0.2);
         }
         .calendar-day-cell.wedding-day {
-          background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(255, 255, 255, 0.95) 50%, rgba(212, 175, 55, 0.1) 100%) !important;
-          background-size: 200% 200% !important;
-          animation: shimmerBg 6s ease infinite !important;
+          background-color: rgba(197, 168, 128, 0.08) !important;
           box-shadow: inset 0 0 0 2px #d4af37 !important;
           z-index: 2;
-        }
-        @keyframes shimmerBg {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
         }
         .wedding-sparkle {
           position: absolute;
           font-size: 14px;
           pointer-events: none;
-          opacity: 0.8;
           z-index: 5;
+          color: #d4af37;
         }
         .wedding-sparkle.s1 {
-          top: 8px;
-          right: 12px;
-          animation: floatSparkle 3s ease-in-out infinite alternate;
+          top: 25px;
+          left: 25%;
+          animation: twinkle 1.5s infinite alternate;
         }
         .wedding-sparkle.s2 {
-          top: 35px;
-          left: 8px;
-          animation: floatSparkle 2.5s ease-in-out infinite alternate-reverse;
+          top: 12px;
+          left: 45%;
+          font-size: 18px;
+          animation: twinkle 2s infinite alternate;
         }
         .wedding-sparkle.s3 {
-          bottom: 35px;
-          right: 8px;
-          animation: floatSparkle 4s ease-in-out infinite alternate;
+          top: 25px;
+          right: 25%;
+          animation: twinkle 1.8s infinite alternate;
         }
-        @keyframes floatSparkle {
-          0% { transform: translateY(0) scale(0.8) rotate(0deg); opacity: 0.4; }
-          100% { transform: translateY(-6px) scale(1.2) rotate(15deg); opacity: 1; }
+        @keyframes twinkle {
+          0% { opacity: 0.35; transform: scale(0.85); }
+          100% { opacity: 1; transform: scale(1.15); }
         }
         .calendar-day-cell.has-events {
           cursor: pointer;
@@ -1295,36 +1289,23 @@ export default function CalendarPlanner({ events, setEvents, weddingDate }) {
           background-color: rgba(197, 168, 128, 0.2);
         }
         .wedding-day-label {
+          position: absolute;
+          top: 55%;
+          left: 50%;
+          transform: translate(-50%, -50%);
           font-family: var(--font-serif);
-          font-size: 11px;
+          font-size: 13px;
           font-weight: 700;
-          color: var(--white) !important;
+          color: var(--gold-hover) !important;
           text-align: center;
-          margin-top: auto;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 5px;
-          background: linear-gradient(135deg, #d4af37 0%, #aa7c11 100%) !important;
+          white-space: nowrap;
+          background: none !important;
           border: none !important;
-          border-radius: 4px !important;
-          padding: 6px 8px !important;
-          width: 100% !important;
-          box-shadow: 0 4px 10px rgba(170, 124, 17, 0.3) !important;
-          letter-spacing: 0.05em;
-          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
-          animation: pulseGold 2s infinite alternate;
+          box-shadow: none !important;
+          padding: 0 !important;
+          margin: 0 !important;
           z-index: 4;
-        }
-        @keyframes pulseGold {
-          0% {
-            box-shadow: 0 2px 6px rgba(170, 124, 17, 0.2);
-            transform: scale(1);
-          }
-          100% {
-            box-shadow: 0 6px 15px rgba(170, 124, 17, 0.5);
-            transform: scale(1.03);
-          }
+          letter-spacing: 0.02em;
         }
 
         /* Adaptación responsiva del calendario mensual en móvil */

@@ -147,14 +147,6 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
           <div className="summary-value">{pendingCount}</div>
         </div>
 
-        <div className="summary-card card select-ink">
-          <span className="summary-label">Regalos Recibidos</span>
-          <div className="summary-value" style={{ color: 'var(--gold-hover)' }}>{totalGiftsAmount.toLocaleString('es-ES')} €</div>
-          <span className="summary-footer" style={{ fontSize: '10px', color: 'var(--muted)', marginTop: '4px' }}>
-            {guestsWithGiftsCount} regalos registrados
-          </span>
-        </div>
-
         <div className="summary-card card">
           <span className="summary-label">Alergias / Dietas</span>
           <div className="summary-value">{dietCount}</div>
@@ -163,6 +155,14 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
         <div className="summary-card card">
           <span className="summary-label">Menús Infantiles</span>
           <div className="summary-value">{childCount}</div>
+        </div>
+
+        <div className="summary-card card select-ink">
+          <span className="summary-label">Regalos Recibidos</span>
+          <div className="summary-value" style={{ color: 'var(--gold-hover)' }}>{totalGiftsAmount.toLocaleString('es-ES')} €</div>
+          <span className="summary-footer" style={{ fontSize: '10px', color: 'var(--muted)', marginTop: '4px' }}>
+            {guestsWithGiftsCount} regalos registrados
+          </span>
         </div>
       </section>
 

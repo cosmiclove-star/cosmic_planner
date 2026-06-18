@@ -203,7 +203,8 @@ export default function Onboarding({ onComplete }) {
                 { id: 'romantic', title: 'Romántico & Fine Art', desc: 'Tonos pastel, luz suave, arreglos florales orgánicos y atmósfera de ensueño.', img: '/style-romantic.jpg' },
                 { id: 'rustic', title: 'Campestre & Rústico Chic', desc: 'Madera vista, luces de verbena, naturaleza y un ambiente cálido e informal.', img: '/style-rustic.jpg' },
                 { id: 'mediterranean', title: 'Mediterráneo', desc: 'Olivos, buganvillas, luz del atardecer, terracota y sabor a mar.', img: '/style-mediterranean.jpg' },
-                { id: 'cosmic', title: 'Extra Cosmic: Nocturna', desc: 'Celebración bajo las estrellas, velas infinitas, misterio y magia astral.', img: '/style-cosmic.jpg' }
+                { id: 'cosmic', title: 'Extra Cosmic: Nocturna', desc: 'Celebración bajo las estrellas, velas infinitas, misterio y magia astral.', img: '/style-cosmic.jpg' },
+                { id: 'custom', title: 'A vuestra manera', desc: 'Una celebración diseñada sin reglas ni moldes, pensada al 100% para reflejar vuestra auténtica personalidad.', img: '' }
               ].map((styleOpt) => {
                 const isActive = formData.style === styleOpt.id;
                 return (
@@ -212,12 +213,18 @@ export default function Onboarding({ onComplete }) {
                     className={`style-card ${isActive ? 'active' : ''}`}
                     onClick={() => setFormData({ ...formData, style: styleOpt.id })}
                   >
-                    <div
-                      className="style-card-image"
-                      style={{ backgroundImage: `url(${styleOpt.img})` }}
-                    >
-                      <div className="style-card-overlay"></div>
-                    </div>
+                    {styleOpt.img ? (
+                      <div
+                        className="style-card-image"
+                        style={{ backgroundImage: `url(${styleOpt.img})` }}
+                      >
+                        <div className="style-card-overlay"></div>
+                      </div>
+                    ) : (
+                      <div className="style-card-no-image">
+                        <Heart className="style-card-heart-icon" size={32} />
+                      </div>
+                    )}
                     <div className="style-card-body">
                       <h4>{styleOpt.title}</h4>
                       <p>{styleOpt.desc}</p>

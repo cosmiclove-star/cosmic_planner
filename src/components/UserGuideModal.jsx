@@ -2,17 +2,19 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Sparkles, DollarSign, Users, CreditCard, Calendar, ArrowLeft, ArrowRight, X, Heart } from 'lucide-react';
 
-export default function UserGuideModal({ isOpen, onClose, setActiveTab }) {
+export default function UserGuideModal({ isOpen, onClose, setActiveTab, userId }) {
   const [step, setStep] = useState(1);
 
   if (!isOpen) return null;
+
+  const guideKey = userId ? `cl_seen_guide_${userId}` : 'cl_seen_guide';
 
   const handleNext = () => {
     if (step < 5) {
       setStep(step + 1);
     } else {
       // Guardar que vio la guía y redireccionar
-      localStorage.setItem('cl_seen_guide', 'true');
+      localStorage.setItem(guideKey, 'true');
       onClose();
       setActiveTab('calendar');
     }
@@ -25,7 +27,7 @@ export default function UserGuideModal({ isOpen, onClose, setActiveTab }) {
   };
 
   const handleSkip = () => {
-    localStorage.setItem('cl_seen_guide', 'true');
+    localStorage.setItem(guideKey, 'true');
     onClose();
   };
 

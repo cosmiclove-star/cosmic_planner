@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Inter:wght@100..900&family=MonteCarlo&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Inter:wght@100..900&family=MonteCarlo&family=Raleway:wght@400;700;800&display=swap');
 
 :root {
   /* Paleta de Colores de Referencia Cosmic Love */
@@ -19,6 +19,7 @@
   --font-serif: 'Fraunces', serif;
   --font-sans: 'Inter', sans-serif;
   --font-script: 'MonteCarlo', cursive;
+  --font-raleway: 'Raleway', sans-serif;
 }
 
 * {

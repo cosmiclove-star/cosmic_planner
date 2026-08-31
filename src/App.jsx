@@ -78,6 +78,14 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showGuideModal, setShowGuideModal] = useState(false);
 
+  const clearLocalWeddingData = () => {
+    const keys = ['cl_onboarded', 'cl_weddingData', 'cl_budget', 'cl_guests', 'cl_tables', 'cl_events'];
+    keys.forEach(k => localStorage.removeItem(k));
+    if (session?.user?.id) {
+      localStorage.removeItem(`cl_seen_guide_${session.user.id}`);
+    }
+  };
+
   const isAdmin = session?.user?.email === 'test@example.com' || session?.user?.email === 'labodadecloe@gmail.com' || session?.user?.email?.endsWith('@cosmiclove.es');
 
   const [budgetItems, setBudgetItems] = useState([]);
@@ -87,8 +95,9 @@ export default function App() {
 
   // Auto-apertura de la guía tras completar el onboarding
   useEffect(() => {
-    if (onboarded) {
-      const seen = localStorage.getItem('cl_seen_guide');
+    if (onboarded && session?.user?.id) {
+      const guideKey = `cl_seen_guide_${session.user.id}`;
+      const seen = localStorage.getItem(guideKey);
       if (seen !== 'true') {
         const timer = setTimeout(() => {
           setShowGuideModal(true);
@@ -96,7 +105,7 @@ export default function App() {
         return () => clearTimeout(timer);
       }
     }
-  }, [onboarded]);
+  }, [onboarded, session]);
 
   // 1. Escuchar el estado de autenticación de Supabase
   useEffect(() => {
@@ -161,20 +170,112 @@ export default function App() {
           if (tablesRes.error) throw tablesRes.error;
           if (eventsRes.error) throw eventsRes.error;
 
-          setBudgetItems(budgetRes.data || []);
-          setGuests((guestsRes.data || []).map(g => ({
+          let loadedBudget = budgetRes.data || [];
+          let loadedGuests = guestsRes.data || [];
+          let loadedTables = tablesRes.data || [];
+          let loadedEvents = eventsRes.data || [];
+
+          // Auto-reparación (Self-Healing) ante onboarding parcial fallido
+          if (loadedTables.length === 0 && loadedEvents.length === 0 && loadedBudget.length === 0) {
+            console.log('Auto-reparación: Detectado estado de onboarding incompleto. Re-inicializando datos...');
+            try {
+              const tableIdMap = {};
+              const defaultTablesList = DEFAULT_TABLES.map(t => {
+                const uniqueId = 't_' + Math.random().toString(36).substring(2, 9) + Date.now().toString().slice(-4);
+                tableIdMap[t.id] = uniqueId;
+                return {
+                  id: uniqueId,
+                  wedding_id: wedding.id,
+                  name: t.name,
+                  capacity: t.capacity
+                };
+              });
+
+              const defaultGuestsList = DEFAULT_GUESTS.map(g => {
+                const uniqueId = 'g_' + Math.random().toString(36).substring(2, 9) + Date.now().toString().slice(-4);
+                const uniqueTableId = g.tableId ? (tableIdMap[g.tableId] || null) : null;
+                return {
+                  id: uniqueId,
+                  wedding_id: wedding.id,
+                  name: g.name,
+                  side: g.side,
+                  diet: g.diet,
+                  status: g.status,
+                  table_id: uniqueTableId,
+                  is_child: g.isChild,
+                  gift_desc: '',
+                  gift_amount: 0
+                };
+              });
+
+              const defaultBudget = DEFAULT_BUDGET_ITEMS(formattedWedding.budget).map(b => {
+                const uniqueId = 'b_' + Math.random().toString(36).substring(2, 9) + Date.now().toString().slice(-4);
+                return {
+                  id: uniqueId,
+                  wedding_id: wedding.id,
+                  category: b.category,
+                  name: b.name,
+                  estimated: b.estimated,
+                  actual: b.actual,
+                  paid: b.paid
+                };
+              });
+
+              const defaultEventsList = DEFAULT_EVENTS(formattedWedding.date).map(e => {
+                const uniqueId = 'e_' + Math.random().toString(36).substring(2, 9) + Date.now().toString().slice(-4);
+                return {
+                  id: uniqueId,
+                  wedding_id: wedding.id,
+                  title: e.title,
+                  date: e.date,
+                  time: e.time,
+                  desc: e.desc,
+                  category: e.category,
+                  completed: e.completed
+                };
+              });
+
+              // 1. Inserción secuencial de mesas
+              const { error: tErr } = await supabase.from('tables').insert(defaultTablesList);
+              if (tErr) throw tErr;
+
+              // 2. Inserción secuencial de presupuesto
+              const { error: bErr } = await supabase.from('budget_items').insert(defaultBudget);
+              if (bErr) throw bErr;
+
+              // 3. Inserción secuencial de invitados
+              const { error: gErr } = await supabase.from('guests').insert(defaultGuestsList);
+              if (gErr) throw gErr;
+
+              // 4. Inserción secuencial de eventos
+              const { error: eErr } = await supabase.from('events').insert(defaultEventsList);
+              if (eErr) throw eErr;
+
+              // Asignar los datos generados a las variables que cargará el estado
+              loadedTables = defaultTablesList;
+              loadedBudget = defaultBudget;
+              loadedGuests = defaultGuestsList;
+              loadedEvents = defaultEventsList;
+              console.log('Auto-reparación: Datos completados con éxito.');
+            } catch (repairError) {
+              console.error('Error durante la auto-reparación de datos:', repairError);
+            }
+          }
+
+          setBudgetItems(loadedBudget);
+          setGuests(loadedGuests.map(g => ({
             id: g.id,
             name: g.name,
             side: g.side,
             diet: g.diet,
             status: g.status,
-            tableId: g.table_id,
-            isChild: g.is_child,
-            giftDesc: g.gift_desc || '',
-            giftAmount: Number(g.gift_amount || 0)
+            tableId: g.table_id || g.tableId,
+            isChild: g.is_child || g.isChild,
+            giftDesc: g.gift_desc || g.giftDesc || '',
+            giftAmount: Number(g.gift_amount || g.giftAmount || 0)
           })));
-          setTables(tablesRes.data || []);
-          setEvents((eventsRes.data || []).map(e => ({
+          setTables(loadedTables);
+          setEvents(loadedEvents.map(e => ({
             id: e.id,
             title: e.title,
             date: e.date,
@@ -196,7 +297,7 @@ export default function App() {
             if (confirmMigrate) {
               await handleMigrateLocalData(JSON.parse(savedWeddingData));
             } else {
-              localStorage.clear();
+              clearLocalWeddingData();
               setOnboarded(false);
             }
           } else {
@@ -353,7 +454,7 @@ export default function App() {
       setGuests(migratedGuests);
       setEvents(migratedEvents);
 
-      localStorage.clear();
+      clearLocalWeddingData();
       setOnboarded(true);
     } catch (err) {
       console.error('Error durante la migración de datos:', err);
@@ -367,6 +468,7 @@ export default function App() {
   // Completar Onboarding e inicializar datos por defecto en Supabase
   const handleOnboardingComplete = async (data) => {
     setDataLoading(true);
+    let createdWeddingId = null;
     try {
       const weddingDate = data.date || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
       
@@ -385,6 +487,7 @@ export default function App() {
         .single();
 
       if (wError) throw wError;
+      createdWeddingId = newWedding.id;
 
       const finalWeddingData = {
         id: newWedding.id,
@@ -452,7 +555,7 @@ export default function App() {
         };
       });
 
-      // 1. Insertar primero las mesas y esperar la confirmación de la base de datos
+      // 1. Inserción secuencial de mesas
       const { error: tError } = await supabase.from('tables').insert(defaultTablesList.map(t => ({
         id: t.id,
         wedding_id: t.wedding_id,
@@ -461,44 +564,45 @@ export default function App() {
       })));
       if (tError) throw tError;
 
-      // 2. Insertar el resto de datos de forma paralela
-      const [budgetRes, guestsRes, eventsRes] = await Promise.all([
-        supabase.from('budget_items').insert(defaultBudget.map(b => ({
-          id: b.id,
-          wedding_id: b.wedding_id,
-          category: b.category,
-          name: b.name,
-          estimated: b.estimated,
-          actual: b.actual,
-          paid: b.paid
-        }))),
-        supabase.from('guests').insert(defaultGuestsList.map(g => ({
-          id: g.id,
-          wedding_id: g.wedding_id,
-          name: g.name,
-          side: g.side,
-          diet: g.diet,
-          status: g.status,
-          table_id: g.tableId,
-          is_child: g.isChild,
-          gift_desc: '',
-          gift_amount: 0
-        }))),
-        supabase.from('events').insert(defaultEventsList.map(e => ({
-          id: e.id,
-          wedding_id: e.wedding_id,
-          title: e.title,
-          date: e.date,
-          time: e.time,
-          desc: e.desc,
-          category: e.category,
-          completed: e.completed
-        })))
-      ]);
+      // 2. Inserción secuencial de presupuesto
+      const { error: bError } = await supabase.from('budget_items').insert(defaultBudget.map(b => ({
+        id: b.id,
+        wedding_id: b.wedding_id,
+        category: b.category,
+        name: b.name,
+        estimated: b.estimated,
+        actual: b.actual,
+        paid: b.paid
+      })));
+      if (bError) throw bError;
 
-      if (budgetRes.error) throw budgetRes.error;
-      if (guestsRes.error) throw guestsRes.error;
-      if (eventsRes.error) throw eventsRes.error;
+      // 3. Inserción secuencial de invitados
+      const { error: gError } = await supabase.from('guests').insert(defaultGuestsList.map(g => ({
+        id: g.id,
+        wedding_id: g.wedding_id,
+        name: g.name,
+        side: g.side,
+        diet: g.diet,
+        status: g.status,
+        table_id: g.tableId,
+        is_child: g.isChild,
+        gift_desc: '',
+        gift_amount: 0
+      })));
+      if (gError) throw gError;
+
+      // 4. Inserción secuencial de eventos
+      const { error: eError } = await supabase.from('events').insert(defaultEventsList.map(e => ({
+        id: e.id,
+        wedding_id: e.wedding_id,
+        title: e.title,
+        date: e.date,
+        time: e.time,
+        desc: e.desc,
+        category: e.category,
+        completed: e.completed
+      })));
+      if (eError) throw eError;
 
       setWeddingData(finalWeddingData);
       setBudgetItems(defaultBudget);
@@ -509,6 +613,15 @@ export default function App() {
       setActiveTab('dashboard');
     } catch (err) {
       console.error('Error al inicializar la boda:', err);
+      // Rollback: Borrar la boda creada si falló alguna de las inserciones secundarias
+      if (createdWeddingId) {
+        console.log('Realizando rollback del onboarding: eliminando boda huérfana id:', createdWeddingId);
+        try {
+          await supabase.from('weddings').delete().eq('id', createdWeddingId);
+        } catch (delErr) {
+          console.error('Error al ejecutar rollback:', delErr);
+        }
+      }
       alert('Error al inicializar tu boda. Inténtalo de nuevo.');
     } finally {
       setDataLoading(false);
@@ -538,7 +651,7 @@ export default function App() {
         }
         
         // Limpiar estados y localStorage
-        localStorage.clear();
+        clearLocalWeddingData();
         setWeddingData({});
         setBudgetItems([]);
         setGuests([]);
@@ -911,7 +1024,7 @@ export default function App() {
       {/* Widget de Feedback para reportar fallos y mejoras */}
       <FeedbackWidget weddingId={weddingData?.id} userEmail={session?.user?.email} />
 
-      <UserGuideModal isOpen={showGuideModal} onClose={() => setShowGuideModal(false)} setActiveTab={setActiveTab} />
+      <UserGuideModal isOpen={showGuideModal} onClose={() => setShowGuideModal(false)} setActiveTab={setActiveTab} userId={session?.user?.id} />
 
       <style>{`
         .portal-app {

@@ -398,7 +398,7 @@ export default function Dashboard({ data, guests, budgetItems, activeTab, setAct
             <h4 className="fair-event-title">Feria Cosmic Love Madrid</h4>
             <div className="fair-details">
               <span><strong>Fecha:</strong> Domingo, 4 de Octubre, 2026</span>
-              <span><strong>Lugar:</strong> Hotel Attica21 (Las Rozas)</span>
+              <span><strong>Lugar:</strong> Hotel Attica 21 (Las Rozas)</span>
             </div>
           </div>
 
@@ -414,18 +414,57 @@ export default function Dashboard({ data, guests, budgetItems, activeTab, setAct
             </div>
           </div>
 
-          <div className="fair-event-card pending-event">
+          <div className="fair-event-card">
             <div className="fair-event-header">
-              <span className="fair-event-city">Nuevas Sedes</span>
-              <span className="fair-badge-secondary">Próximamente</span>
+              <span className="fair-event-city">Vigo</span>
+              <span className="fair-badge">Boutique</span>
             </div>
-            <h4 className="fair-event-title">Vigo, Toledo y Murcia</h4>
-            <p className="fair-event-desc">Fechas e inscripciones por anunciar para las nuevas ediciones boutique de 2026.</p>
+            <h4 className="fair-event-title">Feria Cosmic Love Vigo</h4>
+            <div className="fair-details">
+              <span><strong>Fecha:</strong> Domingo, 25 de Octubre, 2026</span>
+              <span><strong>Lugar:</strong> Hotel Attica 21 Business & Wellness</span>
+            </div>
+          </div>
+
+          <div className="fair-event-card">
+            <div className="fair-event-header">
+              <span className="fair-event-city">Toledo</span>
+              <span className="fair-badge">Boutique</span>
+            </div>
+            <h4 className="fair-event-title">Feria Cosmic Love Toledo</h4>
+            <div className="fair-details">
+              <span><strong>Fecha:</strong> Domingo, 25 de Octubre, 2026</span>
+              <span><strong>Lugar:</strong> Hacienda El Cardenal</span>
+            </div>
+          </div>
+
+          <div className="fair-event-card">
+            <div className="fair-event-header">
+              <span className="fair-event-city">Castellón</span>
+              <span className="fair-badge">Boutique</span>
+            </div>
+            <h4 className="fair-event-title">Feria Cosmic Love Castellón</h4>
+            <div className="fair-details">
+              <span><strong>Fecha:</strong> Domingo, 1 de Noviembre, 2026</span>
+              <span><strong>Lugar:</strong> El Invernadero (Castellón)</span>
+            </div>
+          </div>
+
+          <div className="fair-event-card">
+            <div className="fair-event-header">
+              <span className="fair-event-city">Murcia</span>
+              <span className="fair-badge">Boutique</span>
+            </div>
+            <h4 className="fair-event-title">Feria Cosmic Love Murcia</h4>
+            <div className="fair-details">
+              <span><strong>Fecha:</strong> Domingo, 15 de Noviembre, 2026</span>
+              <span><strong>Lugar:</strong> Sercotel Amistad Murcia****</span>
+            </div>
           </div>
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'center', marginTop: '24px' }}>
-          <a href="https://cosmiclove.es" target="_blank" rel="noreferrer" className="btn btn-primary" style={{ minWidth: '240px' }}>
+          <a href="https://cosmiclove.es/invitacion" target="_blank" rel="noreferrer" className="btn btn-primary" style={{ minWidth: '240px' }}>
             Solicitar Invitación Feria
           </a>
         </div>
@@ -573,16 +612,16 @@ export default function Dashboard({ data, guests, budgetItems, activeTab, setAct
           color: var(--gold);
         }
         .couple-names {
-          font-family: var(--font-serif);
-          font-size: 48px;
-          font-weight: 300;
-          letter-spacing: -0.01em;
+          font-family: var(--font-raleway);
+          font-size: 40px;
+          font-weight: 700;
+          letter-spacing: 0.05em;
           line-height: 1.2;
           margin-bottom: 8px;
         }
         @media (max-width: 600px) {
           .couple-names {
-            font-size: 36px;
+            font-size: 30px;
           }
         }
         .wedding-date-text {

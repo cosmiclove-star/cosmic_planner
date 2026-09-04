@@ -322,8 +322,8 @@ export default function AdminFeedback() {
                 <strong>Atención:</strong> {error}
                 <div className="sql-instructions">
                   <p>Ejecuta el siguiente código en el SQL Editor de tu Supabase para dar permisos:</p>
-                  <code>{`CREATE POLICY "Admins can select feedback" ON public.feedback FOR SELECT TO authenticated USING (auth.jwt() ->> 'email' = 'test@example.com' OR auth.jwt() ->> 'email' = 'labodadecloe@gmail.com' OR auth.jwt() ->> 'email' LIKE '%@cosmiclove.es');
-CREATE POLICY "Admins can delete feedback" ON public.feedback FOR DELETE TO authenticated USING (auth.jwt() ->> 'email' = 'test@example.com' OR auth.jwt() ->> 'email' = 'labodadecloe@gmail.com' OR auth.jwt() ->> 'email' LIKE '%@cosmiclove.es');`}</code>
+                  <code>{`CREATE POLICY "Admins can select feedback" ON public.feedback FOR SELECT TO authenticated USING (auth.jwt() ->> 'email' = 'test@example.com' OR auth.jwt() ->> 'email' = 'labodadecloe@gmail.com' OR auth.jwt() ->> 'email' = 'feria.cosmic.love@gmail.com' OR auth.jwt() ->> 'email' LIKE '%@cosmiclove.es');
+CREATE POLICY "Admins can delete feedback" ON public.feedback FOR DELETE TO authenticated USING (auth.jwt() ->> 'email' = 'test@example.com' OR auth.jwt() ->> 'email' = 'labodadecloe@gmail.com' OR auth.jwt() ->> 'email' = 'feria.cosmic.love@gmail.com' OR auth.jwt() ->> 'email' LIKE '%@cosmiclove.es');`}</code>
                 </div>
               </div>
             </div>
@@ -431,7 +431,7 @@ CREATE POLICY "Admins can delete feedback" ON public.feedback FOR DELETE TO auth
                 <strong>Atención:</strong> {usersError}
                 <div className="sql-instructions">
                   <p>Si la tabla weddings no permite lecturas por administradores, ejecuta esta política en Supabase:</p>
-                  <code>{`CREATE POLICY "Admins can select all weddings" ON public.weddings FOR SELECT TO authenticated USING (auth.jwt() ->> 'email' = 'test@example.com' OR auth.jwt() ->> 'email' = 'labodadecloe@gmail.com' OR auth.jwt() ->> 'email' LIKE '%@cosmiclove.es');`}</code>
+                  <code>{`CREATE POLICY "Admins can select all weddings" ON public.weddings FOR SELECT TO authenticated USING (auth.jwt() ->> 'email' = 'test@example.com' OR auth.jwt() ->> 'email' = 'labodadecloe@gmail.com' OR auth.jwt() ->> 'email' = 'feria.cosmic.love@gmail.com' OR auth.jwt() ->> 'email' LIKE '%@cosmiclove.es');`}</code>
                 </div>
               </div>
             </div>

@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
 import { Plus, Trash2, Users, UserMinus, PlusCircle, Check } from 'lucide-react';
 
-export default function SeatingPlan({ guests, setGuests, tables, setTables }) {
+export default function SeatingPlan({ guests, setGuests, tables, setTables, weddingData = {} }) {
   const [newTableName, setNewTableName] = useState('');
   const [newTableCapacity, setNewTableCapacity] = useState(8);
+
+  const getSideLabel = (sideValue) => {
+    if (sideValue === 'Novio') return `Lado de ${weddingData.coupleName1 || 'Novio'}`;
+    if (sideValue === 'Novia') return `Lado de ${weddingData.coupleName2 || 'Novia'}`;
+    return sideValue;
+  };
 
   const handleAddTable = (e) => {
     e.preventDefault();
@@ -140,7 +146,7 @@ export default function SeatingPlan({ guests, setGuests, tables, setTables }) {
                         >
                           <option value="" disabled>Sentar un invitado aquí...</option>
                           {unseatedGuests.map(g => (
-                            <option key={g.id} value={g.id}>{g.name} ({g.side})</option>
+                            <option key={g.id} value={g.id}>{g.name} ({getSideLabel(g.side)})</option>
                           ))}
                         </select>
                       </div>
@@ -198,7 +204,7 @@ export default function SeatingPlan({ guests, setGuests, tables, setTables }) {
                     <span className="unseated-name">
                        {g.name} {g.isChild && <span style={{ fontSize: '10px', marginLeft: '4px' }} title="Niño/a (Menú Infantil)">👶</span>}
                     </span>
-                    <span className="unseated-side">{g.side} {g.isChild && '• Niño/a'}</span>
+                    <span className="unseated-side">{getSideLabel(g.side)} {g.isChild && '• Niño/a'}</span>
                   </div>
                   {/* Select mesa directo */}
                   {tables.length > 0 && (

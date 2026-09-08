@@ -13,6 +13,12 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterSide, setFilterSide] = useState('all');
 
+  const getSideLabel = (sideValue) => {
+    if (sideValue === 'Novio') return `Lado de ${weddingData.coupleName1 || 'Novio'}`;
+    if (sideValue === 'Novia') return `Lado de ${weddingData.coupleName2 || 'Novia'}`;
+    return sideValue;
+  };
+
   const handleAddGuest = (e) => {
     e.preventDefault();
     if (!newGuest.name.trim()) return;
@@ -69,7 +75,7 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
     guests.forEach(g => {
       const row = [
         g.name,
-        g.side,
+        getSideLabel(g.side),
         g.diet || "-",
         g.isChild ? "Sí" : "No",
         g.tableId || "Sin asignar",
@@ -191,8 +197,8 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
                 value={newGuest.side}
                 onChange={(e) => setNewGuest({ ...newGuest, side: e.target.value })}
               >
-                <option value="Novio">Lado de {weddingData.coupleName1 || 'Novio'}</option>
-                <option value="Novia">Lado de {weddingData.coupleName2 || 'Novia'}</option>
+                <option value="Novio">{getSideLabel('Novio')}</option>
+                <option value="Novia">{getSideLabel('Novia')}</option>
                 <option value="Común">Común</option>
               </select>
             </div>
@@ -285,8 +291,8 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
 
                 <select className="filter-select" value={filterSide} onChange={(e) => setFilterSide(e.target.value)}>
                   <option value="all">Común</option>
-                  <option value="Novio">Lado Novio</option>
-                  <option value="Novia">Lado Novia</option>
+                  <option value="Novio">{getSideLabel('Novio')}</option>
+                  <option value="Novia">{getSideLabel('Novia')}</option>
                 </select>
               </div>
             </div>
@@ -323,7 +329,7 @@ export default function GuestListManager({ guests, setGuests, weddingData = {} }
                         </div>
                       </td>
                       <td>
-                        <span className="guest-side-badge">{g.side}</span>
+                        <span className="guest-side-badge">{getSideLabel(g.side)}</span>
                       </td>
                       <td>
                         {g.diet ? (

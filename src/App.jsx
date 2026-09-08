@@ -1003,6 +1003,7 @@ export default function App() {
             setGuests={handleSetGuests}
             tables={tables}
             setTables={handleSetTables}
+            weddingData={weddingData}
           />
         )}
         {activeTab === 'invitation' && (

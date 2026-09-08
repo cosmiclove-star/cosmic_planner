@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Calendar as CalendarIcon, DollarSign, Users, Award, Heart, CheckCircle2, ChevronRight, ChevronLeft, HelpCircle, CheckSquare, Square, Trash2, Edit3, X, Sparkles, Check, MapPin, User } from 'lucide-react';
 
 const formatName = (name) => {
@@ -1179,14 +1180,15 @@ export default function Dashboard({ data, setWeddingData, guests, budgetItems, a
       `}</style>
 
       {/* Toast Notificación Éxito */}
-      {saveSuccessToast && (
+      {saveSuccessToast && createPortal(
         <div className="toast-success-badge fade-in">
           <Check size={16} /> ¡Datos de la boda actualizados correctamente!
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Modal para Editar Datos de la Boda */}
-      {isEditModalOpen && (
+      {isEditModalOpen && createPortal(
         <div className="edit-modal-overlay fade-in" onClick={() => setIsEditModalOpen(false)}>
           <div className="edit-modal-card" onClick={(e) => e.stopPropagation()}>
             <div className="edit-modal-header">
@@ -1310,7 +1312,8 @@ export default function Dashboard({ data, setWeddingData, guests, budgetItems, a
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       <style>{`
@@ -1360,8 +1363,7 @@ export default function Dashboard({ data, setWeddingData, guests, budgetItems, a
           left: 0;
           right: 0;
           bottom: 0;
-          background: rgba(15, 23, 42, 0.5);
-          backdrop-filter: blur(4px);
+          background: rgba(15, 23, 42, 0.7);
           display: flex;
           align-items: center;
           justify-content: center;

@@ -150,3 +150,7 @@ CREATE POLICY "Authenticated users can insert feedback"
 -- =====================================================================
 ALTER TABLE public.weddings ADD COLUMN IF NOT EXISTS style TEXT DEFAULT 'classic';
 
+-- 10. Añadir columnas de regalos a la tabla 'guests' si no existen (para bases de datos existentes)
+ALTER TABLE public.guests ADD COLUMN IF NOT EXISTS gift_desc TEXT DEFAULT '';
+ALTER TABLE public.guests ADD COLUMN IF NOT EXISTS gift_amount NUMERIC(12, 2) DEFAULT 0.00;
+

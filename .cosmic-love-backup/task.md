@@ -1,11 +1,24 @@
-# Agenda y Tareas - Mejoras Visuales en Calendario
+# Tareas: Registro de Regalos e Integración con Presupuesto
 
-- [x] Modificar `CalendarPlanner.jsx` para mejorar la visualización de las tareas y el día de la boda.
-  - [x] Modificar la altura de fila `.calendar-grid` de 120px a 130px.
-  - [x] Modificar el estilo de `.calendar-event-item` para aumentar tamaño de fuente a 11px, padding a 4px 6px, grosor de borde izquierdo a 3px y añadir bordes redondeados de 3px y hover.
-  - [x] Actualizar el marcado DOM para el día de la boda, agregando las animaciones de confeti y destellos (`wedding-sparkle`) y el texto "💍 ¡Nuestra Boda!".
-  - [x] Añadir los estilos del día de boda (Shimmer y Sparkles) en la etiqueta `<style>`.
-  - [x] Asegurar la adaptabilidad móvil (ocultar sparkles y label completo, mantener tamaño correcto).
-- [x] Validar la compilación del proyecto (`npm run build`).
+- [x] Ejecutar la migración SQL en Supabase para añadir `gift_desc` y `gift_amount` a `guests`. (El usuario lo hará en su panel)
+- [x] Modificar `supabase_setup.sql` en el proyecto para incluir las columnas por defecto en la tabla `guests`.
+- [x] Modificar `App.jsx` para dar soporte a las columnas `gift_desc` y `gift_amount`.
+  - [x] En la carga de datos (`fetchWeddingData`).
+  - [x] En la migración de datos locales (`handleMigrateLocalData`).
+  - [x] En el onboarding inicial (`handleOnboardingComplete`).
+  - [x] En la sincronización en segundo plano (`handleSetGuests`).
+  - [x] Pasar la propiedad `guests` a `<BudgetManager />`.
+- [x] Modificar `GuestListManager.jsx` para dar soporte a regalos.
+  - [x] Añadir la métrica de regalos recibidos y adaptar el grid a 6 columnas.
+  - [x] Añadir los campos de descripción e importe de regalos como inputs editables en la tabla.
+  - [x] Crear la función `handleUpdateGift` para actualizar el estado.
+  - [x] Implementar la función de exportación a CSV para invitados (`handleExportCSV`).
+  - [x] Adaptar la visualización responsiva en móvil.
+- [x] Modificar `BudgetManager.jsx` para integrar las aportaciones.
+  - [x] Recibir la prop `guests` y calcular la suma total monetaria de regalos.
+  - [x] Añadir la quinta tarjeta "Aportaciones de Invitados" y adaptar el grid a 5 columnas.
+  - [x] Actualizar el cálculo del balance neto disponible en el pie de página de "Coste Real Actual".
+  - [x] Adaptar responsividad de 5 columnas en móviles.
+- [x] Compilar y verificar el proyecto localmente (`npm run build`).
 - [x] Desplegar en producción en Vercel.
 - [x] Subir los cambios a GitHub.

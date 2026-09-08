@@ -1,38 +1,44 @@
-# Walkthrough - Mejoras Visuales en el Calendario Mensual
+# Walkthrough - Registro de Regalos e Integración con Presupuesto
 
-Hemos mejorado la visualización del calendario mensual en la versión de ordenador, logrando que las tareas se lean con mayor claridad y añadiendo una celebración sobria y premium para el día de la boda según las indicaciones recibidas.
+Hemos implementado un sistema completo de registro de regalos para los invitados, integrado directamente las aportaciones monetarias en el gestor de presupuesto y añadido la exportación de la lista de invitados a un archivo CSV.
 
 ## Cambios Realizados
 
-Las mejoras visuales se han implementado de forma idéntica en los dos componentes que renderizan el calendario mensual para garantizar una experiencia de usuario coherente y fluida:
+### 1. Base de Datos (Supabase)
+* **Esquema de la Tabla `guests`**: Añadimos las columnas `gift_desc` (descripción del regalo) y `gift_amount` (importe monetario) al archivo de configuración [supabase_setup.sql](file:///c:/Users/Crispis/Documents/Cosmic%20Love/supabase_setup.sql).
+* **Instrucciones de Migración**: Para aplicar este cambio en producción, se preparó la siguiente sentencia SQL:
+  ```sql
+  ALTER TABLE public.guests ADD COLUMN IF NOT EXISTS gift_desc TEXT DEFAULT '';
+  ALTER TABLE public.guests ADD COLUMN IF NOT EXISTS gift_amount NUMERIC(12, 2) DEFAULT 0.00;
+  ```
 
-1. **Dashboard principal** ([Dashboard.jsx](file:///c:/Users/Crispis/Documents/Cosmic%20Love/src/components/Dashboard.jsx))
-2. **Sección "Agenda y Tareas"** ([CalendarPlanner.jsx](file:///c:/Users/Crispis/Documents/Cosmic%20Love/src/components/CalendarPlanner.jsx))
+### 2. Sincronización de Datos ([App.jsx](file:///c:/Users/Crispis/Documents/Cosmic%20Love/src/App.jsx))
+* **Carga de Datos**: Modificamos `fetchWeddingData` para cargar las nuevas columnas de regalos al estado de React.
+* **Onboarding y Migración**: Actualizamos `handleMigrateLocalData` y `handleOnboardingComplete` para persistir estas columnas en la base de datos de Supabase.
+* **Sincronización en Tiempo Real**: Ajustamos `handleSetGuests` para sincronizar los cambios de regalos mediante operaciones `insert` y `update`.
+* **Prop a Presupuesto**: Ahora el estado de `guests` se pasa como prop a `<BudgetManager />`.
 
-### 1. Ampliación y Legibilidad de las Tareas en Desktop
-* **Mayor Espaciado**: Aumentamos la altura de fila de la rejilla del calendario (`grid-auto-rows`) de `120px` a `130px`.
-* **Tareas más Legibles**: El tamaño de la fuente de las tareas (`.calendar-event-item`) se incrementó de `9px` a `11px`, el padding se amplió a `4px 6px`, y el grosor del indicador de categoría izquierdo pasó a ser de `3px` con bordes sutilmente redondeados (`3px`).
-* **Efecto Hover Interactivo**: Añadimos animaciones de elevación al pasar el cursor sobre las tareas individuales (`transform: translateY(-0.5px)` y `box-shadow`) para hacerlas más dinámicas.
+### 3. Registro de Regalos y Exportación CSV ([GuestListManager.jsx](file:///c:/Users/Crispis/Documents/Cosmic%20Love/src/components/GuestListManager.jsx))
+* **Campos Editables en Línea**: Agregamos dos inputs (`text` y `number`) en la tabla de invitados para ingresar la descripción del regalo y el importe. Los cambios se guardan y sincronizan automáticamente.
+* **Tarjeta de Resumen**: Añadimos la tarjeta **Regalos Recibidos** en la cabecera que muestra la suma total acumulada y el número de regalos registrados.
+* **Rediseño del Grid**: Se amplió el grid de métricas a 6 columnas en desktop y se adaptó para una distribución responsiva en smartphones.
+* **Exportar a CSV**: Implementamos el botón **Exportar Lista**. Genera y descarga un archivo CSV con formato UTF-8 BOM (delimitado por punto y coma `;`) para su correcta apertura en Microsoft Excel con decimales en español, conteniendo todas las columnas clave.
 
-### 2. Celebración Simplificada y Premium para el Día de la Boda
-* **Diseño Limpio Sin Botones ni Degradados**: Quitamos el diseño de insignia/botón texturizado y los gradientes dorados del día de la boda.
-* **Texto Centrado en el Cuadrado**: El texto **¡Nuestra Boda!** se posiciona ahora exactamente en el centro geométrico del cuadrado del día (`.wedding-day-label` con posicionamiento absoluto y `transform: translate(-50%, -50%)`).
-* **Tres Destellos Superiores**: Colocamos exactamente 3 destellos (`✨`) por encima del texto, con una animación de parpadeo muy elegante y sutil (`@keyframes twinkle`) que varía ligeramente de velocidad entre cada destello para dar naturalidad.
-* **Sin Confeti**: Eliminamos cualquier emoji de confeti o serpentinas (`🎉`) de la animación flotante para mantener la sofisticación visual.
-* **Fondo y Bordes**: El cuadrado de la boda utiliza ahora un fondo cálido dorado muy suave (`rgba(197, 168, 128, 0.08)`) delimitado por un borde dorado pulido de `2px` (`box-shadow: inset 0 0 0 2px #d4af37`).
-
-### 3. Adaptabilidad y Consistencia en Móviles
-* Mantenemos ocultos todos los elementos de la celebración en móviles (destellos y texto `.wedding-day-label`) mediante `display: none !important`, para conservar la cuadrícula circular minimalista y ligera en pantallas táctiles.
+### 4. Integración en el Gestor de Presupuestos ([BudgetManager.jsx](file:///c:/Users/Crispis/Documents/Cosmic%20Love/src/components/BudgetManager.jsx))
+* **Tarjeta de Aportaciones**: Agregamos una nueva tarjeta en el panel de presupuestos para mostrar el total acumulado de **Regalos Recibidos**.
+* **Balance Neto Disponible**: Modificamos la tarjeta de **Coste Real Actual** para recalcular el Neto Disponible sumando los regalos al presupuesto límite: `Presupuesto Límite + Regalos - Coste Real Actual`.
+* **Diseño Responsivo**: Rediseñamos el layout del grid de 5 tarjetas. En pantallas medianas y móviles, la tarjeta de "Presupuesto Límite" ahora ocupa todo el ancho (`grid-column: span 2`) para formar una cuadrícula perfectamente equilibrada y sin huecos.
 
 ---
 
 ## Verificación y Despliegue
 
-1. **Compilación Correcta**: Se ejecutó localmente `npm run build`, completándose la compilación del cliente en Vite de forma exitosa y sin fallos.
-2. **Despliegue en Producción**: Los cambios fueron publicados en la plataforma en la URL de producción: [https://cosmic-love-portal.vercel.app](https://cosmic-love-portal.vercel.app).
-3. **Repositorio Sincronizado**: Todos los cambios de código fueron confirmados y subidos al repositorio principal en GitHub:
+1. **Compilación de Producción**: Ejecutamos localmente `npm.cmd run build` de manera exitosa, verificando que no existieran errores sintácticos o lógicos en Vite.
+2. **Despliegue Exitoso en Vercel**: La aplicación fue desplegada en producción y se encuentra disponible en:
+   * **URL de Producción**: [https://cosmic-love-portal.vercel.app](https://cosmic-love-portal.vercel.app)
+3. **Repositorio Sincronizado**: Los cambios fueron enviados a la rama principal de GitHub:
    ```bash
-   git add .
-   git commit -m "Simplify wedding day cell: center text ¡Nuestra Boda! and add 3 star sparkles with twinkle animation"
-   git push origin main
+   & "C:\Program Files\Git\bin\git.exe" add src/App.jsx src/components/BudgetManager.jsx src/components/GuestListManager.jsx supabase_setup.sql
+   & "C:\Program Files\Git\bin\git.exe" commit -m "Add guest gift registry, sync with budget manager, implement guest CSV export, and refine mobile layout"
+   & "C:\Program Files\Git\bin\git.exe" push origin main
    ```

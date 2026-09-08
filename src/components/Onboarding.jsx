@@ -15,6 +15,10 @@ export default function Onboarding({ onComplete }) {
   });
 
   const handleNext = () => {
+    if (step === 1 && !formData.date) {
+      const defaultDate = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      setFormData(prev => ({ ...prev, date: defaultDate }));
+    }
     if (step < 4) setStep(step + 1);
     else onComplete(formData);
   };
@@ -33,7 +37,7 @@ export default function Onboarding({ onComplete }) {
   };
 
   const isStepValid = () => {
-    if (step === 1) return formData.coupleName1.trim() !== '' && formData.coupleName2.trim() !== '' && formData.date !== '';
+    if (step === 1) return formData.coupleName1.trim() !== '' && formData.coupleName2.trim() !== '';
     if (step === 2) return formData.location.trim() !== '';
     if (step === 3) return formData.budget > 0;
     if (step === 4) return formData.style !== '';
@@ -91,7 +95,7 @@ export default function Onboarding({ onComplete }) {
             </div>
 
             <div className="form-group">
-              <label className="form-label">Fecha de la boda</label>
+              <label className="form-label">Fecha de la boda (opcional)</label>
               <div className="input-with-icon">
                 <Calendar className="input-icon" size={16} />
                 <input
@@ -102,6 +106,9 @@ export default function Onboarding({ onComplete }) {
                   min={new Date().toISOString().split('T')[0]}
                 />
               </div>
+              <span className="help-text" style={{ fontSize: '11px', color: 'var(--ink-light)', marginTop: '6px', display: 'block', fontStyle: 'italic' }}>
+                ✨ ¿Aún no tenéis fecha fija? Puedes poner una aproximada y modificarla cuando queráis desde vuestro panel de control.
+              </span>
             </div>
           </div>
         )}

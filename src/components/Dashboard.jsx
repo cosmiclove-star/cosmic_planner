@@ -1,13 +1,62 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar as CalendarIcon, DollarSign, Users, Award, Heart, CheckCircle2, ChevronRight, ChevronLeft, HelpCircle, CheckSquare, Square, Trash2 } from 'lucide-react';
+import { Calendar as CalendarIcon, DollarSign, Users, Award, Heart, CheckCircle2, ChevronRight, ChevronLeft, HelpCircle, CheckSquare, Square, Trash2, Edit3, X, Sparkles, Check, MapPin, User } from 'lucide-react';
 
 const formatName = (name) => {
   if (!name) return '';
   return name.trim().replace(/\b\w/g, c => c.toUpperCase());
 };
 
-export default function Dashboard({ data, guests, budgetItems, activeTab, setActiveTab, events = [], setEvents }) {
+export default function Dashboard({ data, setWeddingData, guests, budgetItems, activeTab, setActiveTab, events = [], setEvents }) {
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [saveSuccessToast, setSaveSuccessToast] = useState(false);
+
+  const [editFormData, setEditFormData] = useState({
+    date: data?.date || '',
+    coupleName1: data?.coupleName1 || '',
+    coupleName2: data?.coupleName2 || '',
+    location: data?.location || data?.city || '',
+    style: data?.style || 'classic',
+    budget: data?.budget || 35000
+  });
+
+  useEffect(() => {
+    if (isEditModalOpen && data) {
+      setEditFormData({
+        date: data.date || '',
+        coupleName1: data.coupleName1 || '',
+        coupleName2: data.coupleName2 || '',
+        location: data.location || data.city || '',
+        style: data.style || 'classic',
+        budget: data.budget || 35000
+      });
+    }
+  }, [isEditModalOpen, data]);
+
+  const handleSaveWeddingData = async (e) => {
+    e.preventDefault();
+    if (!editFormData.coupleName1.trim() || !editFormData.coupleName2.trim()) {
+      alert('Por favor, introduce los nombres de ambos novios.');
+      return;
+    }
+
+    if (setWeddingData) {
+      await setWeddingData({
+        ...data,
+        coupleName1: editFormData.coupleName1.trim(),
+        coupleName2: editFormData.coupleName2.trim(),
+        date: editFormData.date,
+        location: editFormData.location.trim(),
+        city: editFormData.location.trim(),
+        style: editFormData.style,
+        budget: Number(editFormData.budget) || 35000
+      });
+    }
+
+    setIsEditModalOpen(false);
+    setSaveSuccessToast(true);
+    setTimeout(() => setSaveSuccessToast(false), 4000);
+  };
 
   function calculateTimeLeft() {
     if (!data.date) return { days: 0, hours: 0, minutes: 0, seconds: 0 };
@@ -119,7 +168,7 @@ export default function Dashboard({ data, guests, budgetItems, activeTab, setAct
   return (
     <div className="dashboard-view fade-in">
       {/* Cabecera Editorial */}
-      <header className="dashboard-header">
+      <header className="dashboard-header" style={{ position: 'relative' }}>
         {data.location && (
           <div className="header-meta">
             <span>{data.location}</span>
@@ -127,8 +176,18 @@ export default function Dashboard({ data, guests, budgetItems, activeTab, setAct
         )}
         <h1 className="couple-names">{formatName(data.coupleName1).toUpperCase()} <span style={{ fontFamily: 'inherit', textTransform: 'lowercase' }}>y</span> {formatName(data.coupleName2).toUpperCase()}</h1>
         <p className="wedding-date-text">
-          {new Date(data.date).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+          {data.date && !isNaN(new Date(data.date).getTime())
+            ? new Date(data.date).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+            : 'Fecha pendiente de definir'}
         </p>
+        <button
+          type="button"
+          className="btn-edit-wedding-header"
+          onClick={() => setIsEditModalOpen(true)}
+          title="Modificar fecha, nombres o detalles de la boda"
+        >
+          <Edit3 size={13} /> Editar datos de la boda
+        </button>
       </header>
 
       {/* Cuenta Atrás Premium */}
@@ -1116,6 +1175,333 @@ export default function Dashboard({ data, guests, budgetItems, activeTab, setAct
             bottom: 2px;
             right: 2px;
           }
+        }
+      `}</style>
+
+      {/* Toast Notificación Éxito */}
+      {saveSuccessToast && (
+        <div className="toast-success-badge fade-in">
+          <Check size={16} /> ¡Datos de la boda actualizados correctamente!
+        </div>
+      )}
+
+      {/* Modal para Editar Datos de la Boda */}
+      {isEditModalOpen && (
+        <div className="edit-modal-overlay fade-in" onClick={() => setIsEditModalOpen(false)}>
+          <div className="edit-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="edit-modal-header">
+              <div>
+                <h3 className="edit-modal-title">Modificar datos de vuestra boda</h3>
+                <p className="edit-modal-subtitle">Actualiza la fecha, nombres o detalles. El portal se recalculará automáticamente.</p>
+              </div>
+              <button type="button" className="btn-close-modal" onClick={() => setIsEditModalOpen(false)}>
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveWeddingData} className="edit-modal-body">
+              <div className="edit-form-grid">
+                <div className="edit-form-group">
+                  <label className="edit-label">Tu nombre</label>
+                  <div className="edit-input-wrapper">
+                    <User size={15} className="edit-input-icon" />
+                    <input
+                      type="text"
+                      className="edit-input"
+                      value={editFormData.coupleName1}
+                      onChange={(e) => setEditFormData({ ...editFormData, coupleName1: e.target.value })}
+                      placeholder="Nombre novio/a 1"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="edit-form-group">
+                  <label className="edit-label">Nombre de tu pareja</label>
+                  <div className="edit-input-wrapper">
+                    <User size={15} className="edit-input-icon" />
+                    <input
+                      type="text"
+                      className="edit-input"
+                      value={editFormData.coupleName2}
+                      onChange={(e) => setEditFormData({ ...editFormData, coupleName2: e.target.value })}
+                      placeholder="Nombre novio/a 2"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="edit-form-group">
+                <label className="edit-label">
+                  Fecha de la boda
+                </label>
+                <div className="edit-input-wrapper">
+                  <CalendarIcon size={15} className="edit-input-icon" />
+                  <input
+                    type="date"
+                    className="edit-input"
+                    value={editFormData.date}
+                    onChange={(e) => setEditFormData({ ...editFormData, date: e.target.value })}
+                    required
+                  />
+                </div>
+                <span className="edit-help-text">
+                  ✨ La fecha actualizará el contador de días y la agenda de hitos.
+                </span>
+              </div>
+
+              <div className="edit-form-grid">
+                <div className="edit-form-group">
+                  <label className="edit-label">Ciudad / Lugar</label>
+                  <div className="edit-input-wrapper">
+                    <MapPin size={15} className="edit-input-icon" />
+                    <input
+                      type="text"
+                      className="edit-input"
+                      value={editFormData.location}
+                      onChange={(e) => setEditFormData({ ...editFormData, location: e.target.value })}
+                      placeholder="Ej. Madrid, Valencia..."
+                    />
+                  </div>
+                </div>
+
+                <div className="edit-form-group">
+                  <label className="edit-label">Estilo de la boda</label>
+                  <select
+                    className="edit-select"
+                    value={editFormData.style}
+                    onChange={(e) => setEditFormData({ ...editFormData, style: e.target.value })}
+                  >
+                    <option value="classic">Clásico & Elegante</option>
+                    <option value="boho">Boho & Rustic</option>
+                    <option value="modern">Moderno & Minimalista</option>
+                    <option value="romantic">Romántico & Fine Art</option>
+                    <option value="rustic">Campestre & Rústico Chic</option>
+                    <option value="mediterranean">Mediterráneo</option>
+                    <option value="cosmic">Extra Cosmic: Nocturna</option>
+                    <option value="custom">A vuestra manera</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="edit-form-group">
+                <label className="edit-label">Presupuesto total estimado (€)</label>
+                <div className="edit-input-wrapper">
+                  <DollarSign size={15} className="edit-input-icon" />
+                  <input
+                    type="number"
+                    className="edit-input"
+                    value={editFormData.budget}
+                    onChange={(e) => setEditFormData({ ...editFormData, budget: e.target.value })}
+                    placeholder="35000"
+                    step="500"
+                  />
+                </div>
+              </div>
+
+              <div className="edit-modal-footer">
+                <button type="button" className="btn-cancel-edit" onClick={() => setIsEditModalOpen(false)}>
+                  Cancelar
+                </button>
+                <button type="submit" className="btn-save-edit">
+                  Guardar Cambios
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        .btn-edit-wedding-header {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          margin-top: 14px;
+          background: rgba(197, 168, 128, 0.12);
+          border: 1px solid var(--gold);
+          color: var(--gold-dark);
+          padding: 8px 16px;
+          border-radius: 20px;
+          font-family: var(--font-sans);
+          font-size: 12px;
+          font-weight: 600;
+          letter-spacing: 0.5px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .btn-edit-wedding-header:hover {
+          background: var(--gold);
+          color: #fff;
+          transform: translateY(-1px);
+        }
+
+        .toast-success-badge {
+          position: fixed;
+          bottom: 24px;
+          right: 24px;
+          background: var(--ink);
+          color: #fff;
+          padding: 12px 20px;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 13px;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+          z-index: 99999;
+          border-left: 3px solid var(--gold);
+        }
+
+        .edit-modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(15, 23, 42, 0.5);
+          backdrop-filter: blur(4px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 9999;
+          padding: 20px;
+        }
+        .edit-modal-card {
+          background: var(--cream);
+          border: 1px solid var(--line);
+          border-radius: 16px;
+          width: 100%;
+          max-width: 520px;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+          overflow: hidden;
+        }
+        .edit-modal-header {
+          padding: 24px 28px 16px 28px;
+          border-bottom: 1px solid var(--line);
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+        }
+        .edit-modal-title {
+          font-family: var(--font-serif);
+          font-size: 20px;
+          font-weight: 500;
+          color: var(--ink);
+          margin: 0 0 4px 0;
+        }
+        .edit-modal-subtitle {
+          font-size: 12px;
+          color: var(--ink-light);
+          margin: 0;
+        }
+        .btn-close-modal {
+          background: transparent;
+          border: none;
+          color: var(--ink-light);
+          cursor: pointer;
+          padding: 4px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: background 0.2s;
+        }
+        .btn-close-modal:hover {
+          background: rgba(0, 0, 0, 0.05);
+          color: var(--ink);
+        }
+        .edit-modal-body {
+          padding: 24px 28px;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+        .edit-form-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 14px;
+        }
+        .edit-form-group {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+        .edit-label {
+          font-size: 11px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          color: var(--ink);
+        }
+        .edit-input-wrapper {
+          position: relative;
+          display: flex;
+          align-items: center;
+        }
+        .edit-input-icon {
+          position: absolute;
+          left: 12px;
+          color: var(--gold);
+        }
+        .edit-input {
+          width: 100%;
+          padding: 10px 12px 10px 36px;
+          border: 1px solid var(--line);
+          border-radius: 8px;
+          background: var(--white);
+          font-size: 13px;
+          color: var(--ink);
+          transition: border-color 0.2s;
+        }
+        .edit-input:focus {
+          outline: none;
+          border-color: var(--gold);
+        }
+        .edit-select {
+          width: 100%;
+          padding: 10px 12px;
+          border: 1px solid var(--line);
+          border-radius: 8px;
+          background: var(--white);
+          font-size: 13px;
+          color: var(--ink);
+        }
+        .edit-help-text {
+          font-size: 11px;
+          color: var(--ink-light);
+          font-style: italic;
+          margin-top: 2px;
+        }
+        .edit-modal-footer {
+          display: flex;
+          justify-content: flex-end;
+          gap: 12px;
+          margin-top: 10px;
+        }
+        .btn-cancel-edit {
+          padding: 10px 18px;
+          border-radius: 8px;
+          border: 1px solid var(--line);
+          background: transparent;
+          font-size: 13px;
+          color: var(--ink-light);
+          cursor: pointer;
+        }
+        .btn-save-edit {
+          padding: 10px 22px;
+          border-radius: 8px;
+          border: none;
+          background: var(--ink);
+          color: #fff;
+          font-size: 13px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background 0.2s;
+        }
+        .btn-save-edit:hover {
+          background: var(--gold);
         }
       `}</style>
     </div>

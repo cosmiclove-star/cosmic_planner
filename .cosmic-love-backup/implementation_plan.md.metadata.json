@@ -1,6 +1,6 @@
 {
   "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
-  "summary": "Plan to fix database synchronization issues caused by concurrent table and guest insertion race conditions.",
-  "updatedAt": "2026-06-15T22:58:01.802258900Z",
+  "summary": "Implementation plan for adding gift registration to guests, syncing monetary contributions with the budget manager, and adding guest list CSV export.",
+  "updatedAt": "2026-06-16T18:40:37.496265Z",
   "requestFeedback": true
 }

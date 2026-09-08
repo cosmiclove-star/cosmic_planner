@@ -970,6 +970,7 @@ export default function App() {
         {activeTab === 'dashboard' && (
           <Dashboard
             data={weddingData}
+            setWeddingData={handleSetWeddingData}
             guests={guests}
             budgetItems={budgetItems}
             activeTab={activeTab}
